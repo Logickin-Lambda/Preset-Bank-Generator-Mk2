@@ -11,8 +11,42 @@
 fn vec_new($type){
 	$vec = new(4, 1, $type)
 	clean($vec)
-	set_prop( $vec, "size", 0 )
 	
+	$vec.size 		= 0
+	$vec.get_size 	= vec_size
+
+	$vec.push 		= {
+		$vec   = $1
+		$value = $2
+		vec_push($vec, $value)
+	}
+
+	$vec.pop		= {
+		$vec   = $1
+		$value = $2
+		ret(vec_pop($vec, $value))		
+	}
+
+	$vec.insert_at 	= {
+		$vec   = $1
+		$index = $2
+		$value = $3
+		vec_insert_at($vec, $index, $value)
+	}
+
+	$vec.delete_at	= {
+		$vec   = $1
+		$index = $2
+		$value = $3
+		(vec_delete_at($vec, $index, $value))	
+	}
+
+	$vec.search	= {
+		$vec   = $1
+		$value = $2
+		ret(vec_search($vec, $value))	
+	}
+
 	ret($vec)
 }
 
@@ -23,7 +57,7 @@ fn vec_size($vec){
 
 // append a new element at the end of the vector
 fn vec_push($vec, $value){
-	
+
 	$xsize   = get_xsize( $vec )
 	$vecsize = get_prop( $vec, "size")
 	

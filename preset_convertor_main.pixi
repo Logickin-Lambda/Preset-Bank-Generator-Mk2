@@ -1,0 +1,54 @@
+// *************************************************************************************************************
+// Preset bank generator mk2
+// 
+// We (Acheney and Logickin) decided to make use of pixilang to build a program,
+// to provide an eco-system for managing presents, with maximizing the advantage of the reset standards:
+// 
+// Including:
+// - Patch Cards: Inspired by the accipiter preset module, Acheney expended the functionality
+//		by adding presents export into their modules, so that user can export their presets
+//		into the Acheney preset on the fly.
+//
+// - Patch Banks: Taking the compression into extreme, Logickin made a former program for
+//	 	fitting all the preset data into a pattern, result in a highly compact, BUT immutable
+// 		preset bank module. Ideal for user who just want to quickly switching the sound by keypresses.
+// 	
+// Ultmately, we will merge the two standards into one if SunVox provides update
+// like writing into patterns inside metamodules on project play, 
+// or supporting pixilang in SunVox, which is not possible at the moment.
+//
+// *************************************************************************************************************
+
+// pixi file dependencies
+	include "lib/utils/show_log.pixi"
+	include "lib/utils/vector.pixi"
+
+
+// main program, containing:
+
+// 1. Start of the program, loading config if necessary, and
+//    Loading any SunVox instance here, and these should be the only global objects
+
+	logf("Hello World")
+
+
+// 2. Function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
+
+	// Function calls...
+
+
+// 3&4. Function calls for file extractions and validations
+
+	// Function calls...
+
+
+// 5&6: Function calls for generating and exporting presets
+
+	// Function calls...
+
+
+// 7. function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
+
+	// Function calls...
+
+	show_log()	// This is only for debug purpose

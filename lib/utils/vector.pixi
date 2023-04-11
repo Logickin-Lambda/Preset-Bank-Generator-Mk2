@@ -1,0 +1,119 @@
+// *********************************************************************************************
+// Vector for pixilang
+// 
+// This library adds an abstraction of vector on pixilang containers
+// so that containers can be used like a vector in other common languages.
+// Because there is no concept of objects and structures in pixilang,
+// the "vector" reference must be specified when these function are called
+// *********************************************************************************************
+
+// initialize a new vector object
+fn vec_new($type){
+	$vec = new(4, 1, $type)
+	clean($vec)
+	set_prop( $vec, "size", 0 )
+	
+	ret($vec)
+}
+
+// get the vector size
+fn vec_size($vec){
+	ret (get_prop( $vec, "size"))
+}
+
+// append a new element at the end of the vector
+fn vec_push($vec, $value){
+	
+	$xsize   = get_xsize( $vec )
+	$vecsize = get_prop( $vec, "size")
+	
+	if $xsize <= $vecsize {
+		resize( $vec, $xsize * 2, 1 )
+	}
+	
+	$vec[$vecsize] = $value
+	set_prop( $vec, "size", $vecsize + 1 )
+}
+
+// popping the last element out of the vector
+// and returning the last element
+// returns -1 if it is empty
+fn vec_pop ($vec){
+	$vecsize = get_prop( $vec, "size")
+	
+	if $vecsize > 0 {
+		
+		$last_data = $vec[$vecsize - 1]
+		
+		$vec[$vecsize - 1] = 0
+		set_prop( $vec, "size", $vecsize - 1 )
+		
+		ret ($last_data)
+	}else{
+		ret(-1)
+	}
+}
+
+// insert a new item at index, moving the following items by +1 index
+fn vec_insert_at ($vec, $index, $value){
+
+	$xsize   = get_xsize( $vec )
+	$vecsize = get_prop( $vec, "size")
+	
+	if $xsize <= $vecsize {
+		resize( $vec, $xsize * 2, 1 )
+	}
+	
+	set_prop( $vec, "size", $vecsize + 1 )
+	
+	// move all the items to right after the index
+	for ($i = $vecsize; $i > $index; $i - 1){
+		$vec[$i] = $vec[$i - 1]
+	}
+	
+	$vec[$index] = $value
+}
+
+// delete a item at index, moving the following items by -1 index]
+// return 0 if it has properly cleared from the vec; 
+// else return -1 if an invalid index has been found
+fn vec_delete_at ($vec, $index){
+	
+	$xsize   = get_xsize( $vec )
+	$vecsize = get_prop( $vec, "size")
+	
+	if $index >= $vecsize {
+		ret(-1)
+	}
+	
+	if $xsize <= $vecsize {
+		resize( $vec, $xsize * 2, 1 )
+	}
+	
+	// move all the items to left after the index
+	// except for the last element
+	for ($i = $index; $i < $vecsize - 1; $i + 1){
+		$vec[$i] = $vec[$i + 1]
+	}
+	
+	// clear the last element
+	$vec[$vecsize - 1] = 0		
+	set_prop( $vec, "size", $vecsize - 1 )
+	
+	ret(0)
+}
+
+// linear search for a specific item, and return an index
+// returns -1 when the value is not found
+fn vec_search ($vec, $value){
+	
+	$vecsize = get_prop( $vec, "size")
+	
+	for ($i = 0; $i <= $vecsize; $i + 1){
+		if $vec[$i] == $value {
+			ret ($i)
+		}
+	}
+	
+	ret(-1)
+}

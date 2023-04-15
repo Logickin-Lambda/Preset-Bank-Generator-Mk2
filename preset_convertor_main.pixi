@@ -23,6 +23,14 @@
 	include "lib/utils/show_log.pixi"
 	include "lib/utils/vector.pixi"
 
+	include "lib/gui/components/color_utils.pixi"
+	include "lib/gui/components/GUI.pixi"
+	include "lib/gui/components/button.pixi"
+	include "lib/gui/components/checkbox.pixi"
+	include "lib/gui/components/gui_window_frame.pixi"
+	include "lib/gui/components/text_message.pixi"
+	include "lib/gui/preset_converter_options.pixi"
+
 
 // main program, containing:
 
@@ -30,11 +38,23 @@
 //    Loading any SunVox instance here, and these should be the only global objects
 
 	logf("Hello World")
+	
+
 
 
 // 2. Function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
+// GUIs are also exceptions for global variable since the objects cannot be returned from function for some reason
 
-	// Function calls...
+	$options_gui = construct_preset_converter_options_gui()
+
+	while $options_gui.children[17].has_clicked == 0 {
+		clear()
+
+		$options_gui.draw( $options_gui )
+		handle_options_events($options_gui)
+
+		frame()
+	}
 
 
 // 3&4. Function calls for file extractions and validations

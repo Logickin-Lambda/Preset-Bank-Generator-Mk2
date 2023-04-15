@@ -1,0 +1,89 @@
+CHECKBOX_OFF = 0
+CHECKBOX_ON  = 1
+
+fn check_box_new ($parent, $xpos, $ypos, $label, $state, $color) {
+
+    // Set the color as default if COLOR_DEFAULT has used
+    if $color == COLOR_DEFAULT {
+        $color = COLOR_LIGHT
+    }
+
+    $default_transp = 255
+    if $state == CHECKBOX_OFF {
+        $default_transp = 0
+    }
+
+    // Create a button object, and the border of the button
+    $check_box = GUI_new( $parent, $xpos + 4, $ypos, 30, 30, $color, 255, -1)
+    $check_box.has_checked = $state
+    $check_box.event_sent  = 0
+
+    // Create a clickable space 
+    $check_box.children[0] = GUI_new ( $check_box, $xpos + 6, $ypos + 2, 26, 26, BLACK, 255, -1)
+    $check_box.children[1] = GUI_new ( $check_box, $xpos + 9, $ypos + 5, 20, 20, $color, $default_transp, -1)
+
+    $check_box_indicator = $check_box.children[0] 
+    $check_box_clickable = $check_box.children[1] 
+
+    // Add description for the checkbox
+    GUI_add_text($check_box)
+    $check_box.str[ 0 ].text = $label
+    $check_box.str[ 0 ].flags = 0b00000100  // align to right
+    $check_box.str[ 0 ].x = 40
+    $check_box.original_color = $color
+    
+    // Define all the behavior for the checkbox
+    $check_box_clickable.onhover = {
+        $indicator = $1.parent.children[1]
+        $check_box = $1.parent
+
+        if $check_box.has_checked == CHECKBOX_OFF {
+            $indicator.transp = 96
+        }else{
+            $indicator.transp = 160
+        }
+
+        
+    }
+
+    $check_box_clickable.onleave = {  
+        $indicator = $1.parent.children[1]
+        $state = $1.parent.has_checked
+
+        if $state == CHECKBOX_OFF {
+            $indicator.transp = 0
+        }else{
+            $indicator.transp = 255
+        }
+    }
+
+    $check_box_clickable.onhold = {
+        $check_box = $1.parent
+        if $check_box.has_checked == CHECKBOX_OFF && $check_box.event_sent == 0 {
+            $check_box.has_checked = CHECKBOX_ON
+            $check_box.event_sent  = 1
+        }
+
+        if $check_box.has_checked == CHECKBOX_ON && $check_box.event_sent == 0 {
+            $check_box.has_checked = CHECKBOX_OFF
+            $check_box.event_sent  = 1
+        }
+    }
+
+    $check_box_clickable.onrelease = {
+        $check_box = $1.parent
+        $check_box.event_sent  = 0
+    }
+
+    ret($check_box)
+}
+
+fn check_box_forced_on ($check_box) {
+    $check_box.has_checked = 1
+    $check_box.children[1].transp = 255
+}
+
+fn check_box_forced_off ($check_box) {
+    $check_box.has_checked = 0
+    $check_box.children[1].transp = 0
+}

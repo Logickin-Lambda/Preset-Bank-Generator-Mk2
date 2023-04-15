@@ -1,0 +1,29 @@
+// The color for the components, based on bootstrap naming and coloring:
+COLOR_DEFAULT     = -1
+COLOR_PRIMARY     = #3B71CA
+COLOR_SECONDARY   = #9FA6B2
+COLOR_SUCCESS     = #14A44D
+COLOR_DANGER      = #DC4C64
+COLOR_WARNING     = #E4A11B
+COLOR_INFO        = #54B4D3
+COLOR_LIGHT       = #FBFBFB
+
+
+// This is used for setting the text to black, if the backgound is too bright
+// This code is based on the "Calculating the Perceived Brightness of a Color" in Nbd-Tech
+// reference: https://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx
+// 
+fn is_white_text_applied ( $color ){
+
+    $r = get_red( $color )
+    $g = get_green( $color )
+    $b = get_blue( $color )
+
+    $brightness = sqrt (pow($r, 2) * .241 + pow($g, 2) * .691 + pow($b, 2) * .068)
+
+    if $brightness < 200 {
+        ret(1)
+    }else{
+        ret(0)
+    }
+}

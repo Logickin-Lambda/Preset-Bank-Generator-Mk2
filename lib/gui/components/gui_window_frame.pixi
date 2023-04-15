@@ -1,0 +1,45 @@
+fn gui_window_frame_new ($parent, $xpos, $ypos, $width, $height, $label, $color) {
+
+    // Define the minimal height of the frame
+    if $height < 60 {
+        $height = 60
+    }
+
+    // Define the width and color of the frame
+    $string_width = 9 * strlen($label)
+
+    if $width < $string_width + 10 {
+        $width = $string_width + 10
+    }
+
+    // Set the color as default if COLOR_DEFAULT has used
+    if $color == COLOR_DEFAULT {
+        $color = COLOR_LIGHT
+    }
+
+    $txt_color = WHITE
+
+    if $color == COLOR_DEFAULT {
+        $color = COLOR_LIGHT
+    }else {
+        if is_white_text_applied ($color) == 0 {
+            $txt_color = BLACK
+        } 
+    }
+
+    // Create an outer rectangle
+    $gui_window_frame = GUI_new( $parent, $xpos - $width / 2, $ypos - $height / 2, $width, $height, $color, 255, -1)
+
+    // Create an inner rectangle, forming a border
+    $gui_window_frame.children[0] = GUI_new ( $gui_window_frame, $xpos - ($width - 8) / 2, $ypos - ($height - 8) / 2, $width - 8 , $height - 8, BLACK, 255, -1)
+
+    // Create an header
+    $gui_window_frame.children[1] = GUI_new ( $gui_window_frame, $xpos - ($width - 8) / 2, $ypos - ($height - 8) / 2, $string_width , 30, $color, 255, -1)
+    $gui_window_frame_title = $gui_window_frame.children[1]
+
+    GUI_add_text($gui_window_frame_title)
+    $gui_window_frame_title.str[0].text = $label
+    $gui_window_frame_title.str[0].color = $txt_color
+
+    ret($gui_window_frame)
+}

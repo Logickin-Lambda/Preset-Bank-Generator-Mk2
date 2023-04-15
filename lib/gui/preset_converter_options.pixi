@@ -1,0 +1,170 @@
+fn construct_preset_converter_options_gui () {
+
+    $options_gui = GUI_new( -1, //parent
+                    -0, -0, //x, y position
+                    0, 0, //width, height
+                    BLACK, 0, //color, transparency
+                    -1 //texture
+                    )
+    
+    $options_gui.children[0] = gui_window_frame_new($options_gui, 0, 0, 800, 600, "Preset Generator", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.app_border = $options_gui.children[0]
+
+    // Input Path:
+    $options_gui.children[1] = text_message_new($options_gui, -290, -230, "Input Path:", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.input_path_label = $options_gui.children[1].str[0].text
+
+    $options_gui.children[2] = button_new($options_gui, -280, -245, "", COLOR_SECONDARY)
+    $options_gui.children[2].w = 550
+    $options_gui.children[2].children[0].w = 544
+    $options_gui.children[2].children[0].str[ 0 ].x - 40
+    $options_gui.children[2].children[0].str[ 0 ].flags = 0b00000100
+	$options_gui.gui_comp_lkup.input_path_text_box = $options_gui.children[2]
+
+    $options_gui.children[3] = button_new($options_gui, 275, -245, "Load", COLOR_INFO)
+	$options_gui.gui_comp_lkup.input_path_load_btn = $options_gui.children[3]
+
+    // File Name:
+    $options_gui.children[4] = text_message_new($options_gui, -290, -180, "File Name:", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.file_name_label = $options_gui.children[4].str[0].text
+
+
+    $options_gui.children[5] = button_new($options_gui, -280, -195, "", COLOR_SECONDARY)
+    $options_gui.children[5].w = 550
+    $options_gui.children[5].children[0].w = 544
+    $options_gui.children[5].children[0].str[ 0 ].x - 40
+    $options_gui.children[5].children[0].str[ 0 ].flags = 0b00000100
+	$options_gui.gui_comp_lkup.file_name_text_box = $options_gui.children[5]
+
+    // Output Path:
+    $options_gui.children[6] = text_message_new($options_gui, -290, -130, "Output Path:", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.output_path_label = $options_gui.children[6].str[0].text
+
+    $options_gui.children[7] = button_new($options_gui, -280, -145, "", COLOR_SECONDARY)
+    $options_gui.children[7].w = 550
+    $options_gui.children[7].children[0].w = 544
+    $options_gui.children[7].children[0].str[ 0 ].x - 40
+    $options_gui.children[7].children[0].str[ 0 ].flags = 0b00000100
+	$options_gui.gui_comp_lkup.output_path_text_box = $options_gui.children[7]
+
+    $options_gui.children[8] = button_new($options_gui, 275, -145, "Load", COLOR_INFO)
+	$options_gui.gui_comp_lkup.output_path_load_btn = $options_gui.children[8]
+
+    // Export Options:
+    $options_gui.children[9]  = text_message_new($options_gui, -290, -80, "Export AS:", COLOR_DEFAULT)
+    $options_gui.children[10] = check_box_new($options_gui, -280, -90, "Patch Cards", CHECKBOX_ON, COLOR_DEFAULT)
+    $options_gui.children[11] = check_box_new($options_gui, -120, -90, "Compressed Patch Banks", CHECKBOX_ON, COLOR_DEFAULT)
+
+	$options_gui.gui_comp_lkup.export_as_label = $options_gui.children[9].str[0].text
+	$options_gui.gui_comp_lkup.export_as_cards_cb = $options_gui.children[10]
+	$options_gui.gui_comp_lkup.export_as_banks_cb = $options_gui.children[11]
+
+    // Storage Optimization
+    $options_gui.children[12] = text_message_new($options_gui, -290, -30, "Optimization:", COLOR_DEFAULT)
+    $options_gui.children[13] = check_box_new($options_gui, -280, -40, "None", CHECKBOX_OFF, COLOR_DEFAULT)
+    $options_gui.children[14] = check_box_new($options_gui, -120, -40, "Normal", CHECKBOX_ON, COLOR_DEFAULT)
+    $options_gui.children[15] = check_box_new($options_gui, 40, -40, "Aggressive (Unstable)", CHECKBOX_OFF, COLOR_DANGER)
+
+	$options_gui.gui_comp_lkup.otmz_label = $options_gui.children[12].str[0].text
+	$options_gui.gui_comp_lkup.otmz_none_cb = $options_gui.children[13]
+	$options_gui.gui_comp_lkup.otmz_normal_cb = $options_gui.children[14]
+	$options_gui.gui_comp_lkup.otmz_aggressive_cb = $options_gui.children[15]
+
+    // Message Box 
+    $options_gui.children[16] = gui_window_frame_new($options_gui, 0, 125, 720, 200, "Messages", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.msg_box = $options_gui.children[16]
+
+    // Export button
+    $options_gui.children[17] = button_new($options_gui, 275, 240, "Export", COLOR_INFO)
+	$options_gui.gui_comp_lkup.export_btn = $options_gui.children[17]
+
+	// define control state
+	$options_gui.export_as_radio_btn_state = 1
+
+    ret($options_gui)
+}
+
+fn handle_options_events($options_gui){
+
+	$gui_comp = $options_gui.gui_comp_lkup
+
+    while get_event()
+    {
+        if EVT[ EVT_TYPE ] == EVT_QUIT { halt }
+        $options_gui.check( $options_gui ) //call check function
+        $options_gui.evt( $options_gui ) //call interaction handler
+
+        // trigger text editor for the test editing buttons
+		if $gui_comp.input_path_text_box.has_clicked == 1 {
+			click_and_edit_text ($gui_comp.input_path_text_box, $gui_comp.input_path_label)
+		}
+
+		if $gui_comp.file_name_text_box.has_clicked == 1 {
+			click_and_edit_text ($gui_comp.file_name_text_box, $gui_comp.file_name_label)
+		}
+
+		if $gui_comp.output_path_text_box.has_clicked == 1 {
+			click_and_edit_text ($gui_comp.output_path_text_box, $gui_comp.output_path_label)
+		}
+        
+		// trigger file dialog on button press
+		if $gui_comp.input_path_load_btn.has_clicked == 1 {
+			click_and_pick_file ($gui_comp.input_path_load_btn, $gui_comp.input_path_text_box, $gui_comp.file_name_label)
+		}
+
+		if $gui_comp.output_path_load_btn.has_clicked == 1 {
+			click_and_pick_file ($gui_comp.output_path_load_btn, $gui_comp.output_path_text_box, $gui_comp.output_path_label)
+		}
+
+		// radio button actions
+		if $gui_comp.otmz_none_cb.has_checked == 1 && $options_gui.export_as_radio_btn_state != 0{
+			check_box_forced_off($gui_comp.otmz_normal_cb)
+			check_box_forced_off($gui_comp.otmz_aggressive_cb)
+			$options_gui.export_as_radio_btn_state = 0
+		}
+
+		if $gui_comp.otmz_normal_cb.has_checked == 1 && $options_gui.export_as_radio_btn_state != 1{
+			check_box_forced_off($gui_comp.otmz_none_cb)
+			check_box_forced_off($gui_comp.otmz_aggressive_cb)
+			$options_gui.export_as_radio_btn_state = 1
+		}
+
+		if $gui_comp.otmz_aggressive_cb.has_checked == 1 && $options_gui.export_as_radio_btn_state != 2{
+			check_box_forced_off($gui_comp.otmz_none_cb)
+			check_box_forced_off($gui_comp.otmz_normal_cb)
+			$options_gui.export_as_radio_btn_state = 2
+		}
+    }
+}
+
+fn click_and_edit_text ($text_box_button, $label){
+
+    $modified_text = textinput_dialog ($text_box_button.children[0].str_full, $label)
+	$text_box_button.children[0].str[0].text = trim_long_string ($modified_text)
+	$text_box_button.children[0].str_full = $modified_text
+
+	click_event_has_sent($text_box_button)
+}
+
+fn click_and_pick_file ($load_button, $text_box_button, $label) {
+
+	$file_path = file_dialog($label, "", $label, "")
+	$text_box_button.children[0].str[0].text = trim_long_string ($file_path)
+	$text_box_button.children[0].str_full = $file_path
+
+	click_event_has_sent($load_button)
+}
+
+fn trim_long_string ($modified_text){
+
+	if strlen($modified_text) >= 60 {
+		$temp_str = ""
+		$temp_str[0] = 0
+		strcat($temp_str, "...")
+		strcat($temp_str, 0, $modified_text, strlen($modified_text) - 60)
+
+		ret($temp_str)
+	} else {
+		ret($modified_text)
+	}
+}

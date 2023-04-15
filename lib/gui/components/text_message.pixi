@@ -1,0 +1,12 @@
+fn text_message_new ($parent, $xpos, $ypos, $label, $txt_color) {
+
+    // Create an outer rectangle
+    $text_message = GUI_new( $parent, $xpos, $ypos, 10, 10, BLACK, 255, -1)
+
+    GUI_add_text($text_message)
+    $text_message.str[0].text = $label
+    $text_message.str[0].color = $txt_color
+    $text_message.str[0].flags = 0b00001000  // align to left
+
+    ret($text_message)
+}

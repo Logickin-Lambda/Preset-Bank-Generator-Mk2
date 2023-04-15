@@ -1,0 +1,80 @@
+fn button_new ($parent, $xpos, $ypos, $label, $color) {
+
+    // Define the width and color of the button
+    $string_width = 9 * strlen($label)
+
+    if $string_width <= 100 {
+        $string_width = 100
+    }
+
+    $txt_color = WHITE
+
+    if $color == COLOR_DEFAULT {
+        $color = COLOR_PRIMARY
+    }else {
+        if is_white_text_applied ($color) == 0 {
+            $txt_color = BLACK
+        } 
+    }
+
+    // Create a button object, and the border of the button
+    $button = GUI_new( $parent, $xpos, $ypos, $string_width, 40, BLACK, 255, -1)
+    $button.has_clicked = 0;
+
+    // Create a clickable area of a button
+    $r = get_red( $color )
+    $g = get_green( $color )
+    $b = get_blue( $color )
+
+    $button.children[0] = GUI_new ( $button, $xpos + 3, $ypos + 3, $string_width - 6, 34, get_color( $r * 0.9, $g * 0.9, $b * 0.9), 255, -1)
+    $button_clickable = $button.children[0] 
+    
+    GUI_add_text($button_clickable)
+    $button_clickable.str[ 0 ].text = $label
+    $button_clickable.str[ 0 ].color = $txt_color
+    $button_clickable.original_color = $color
+
+
+    $button_clickable.onhover = {  
+        $r = get_red( $1.original_color )
+        $g = get_green( $1.original_color )
+        $b = get_blue( $1.original_color )
+        $1.color = get_color( $r * 0.75, $g * 0.75, $b * 0.75)
+    }
+
+    $button_clickable.onleave = {  
+        $r = get_red( $1.original_color )
+        $g = get_green( $1.original_color )
+        $b = get_blue( $1.original_color )
+        $1.color = get_color( $r * 0.9, $g * 0.9, $b * 0.9)
+    }
+
+    $button_clickable.onhold = {  
+        $r = get_red( $1.original_color )
+        $g = get_green( $1.original_color )
+        $b = get_blue( $1.original_color )
+
+        $parent = $1.parent
+        $1.color = get_color( $r * 0.6 , $g * 0.6 , $b * 0.6)
+        $parent.color  = get_color( $r , $g , $b)
+            
+        $parent.has_clicked = 1
+    }
+
+    $button_clickable.onpress = {
+        $parent = $1.parent
+        $parent.color  = BLACK
+    }
+
+    $button_clickable.click_successed = {
+        $parent = $1.parent
+        $parent.has_clicked = 0
+    }
+
+    ret($button)
+}
+
+// There is no way to trigger once for the available events, the click state must be stopped explicitly
+fn click_event_has_sent($button){
+    $button.has_clicked = 0
+}

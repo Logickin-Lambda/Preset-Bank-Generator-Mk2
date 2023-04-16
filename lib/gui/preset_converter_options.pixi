@@ -1,3 +1,14 @@
+// *********************************************************************************************
+// Construct the whole setting page by components
+// 
+// Input: 
+// Output: 
+//   - GUI container that represents the whole setting page, containing
+// 	   - all the interactive components
+// 	   - a look up table for accessing component simipler, without seeking the array index
+// 	   - additional controller state for customized behaviors 
+//
+// ********************************************************************************************* 
 fn construct_preset_converter_options_gui () {
 
     $options_gui = GUI_new( -1, //parent
@@ -70,9 +81,20 @@ fn construct_preset_converter_options_gui () {
 	$options_gui.gui_comp_lkup.otmz_normal_cb = $options_gui.children[14]
 	$options_gui.gui_comp_lkup.otmz_aggressive_cb = $options_gui.children[15]
 
-    // Message Box 
+	$options_gui.gui_comp_lkup.otmz_aggressive_cb.str[0].color = COLOR_DANGER
+
+    // Message Box, window frame with 
     $options_gui.children[16] = gui_window_frame_new($options_gui, 0, 125, 720, 200, "Messages", COLOR_DEFAULT)
 	$options_gui.gui_comp_lkup.msg_box = $options_gui.children[16]
+
+	GUI_add_text($options_gui.children[16].children[0])
+	$options_gui.gui_comp_lkup.msg_box_text = $options_gui.children[16].children[0].str[0]
+
+	$options_gui.gui_comp_lkup.msg_box_text.text = APP_MSGS.INFO
+	$options_gui.gui_comp_lkup.msg_box_text.x - 335
+	$options_gui.gui_comp_lkup.msg_box_text.y - 45
+	$options_gui.gui_comp_lkup.msg_box_text.flags = 0b00000101 
+	$options_gui.gui_comp_lkup.msg_box_text.color = COLOR_LIGHT
 
     // Export button
     $options_gui.children[17] = button_new($options_gui, 275, 240, "Export", COLOR_INFO)
@@ -84,6 +106,17 @@ fn construct_preset_converter_options_gui () {
     ret($options_gui)
 }
 
+// *********************************************************************************************
+// Process the behavior of the GUI
+// 
+// Input   : 
+//   - $options_gui: GUI container
+// behavior: 
+// 	 - callback on button clicks
+// 	 - radio button actions
+// 	 - calling native text editor and file dialogs
+//
+// ********************************************************************************************* 
 fn handle_options_events($options_gui){
 
 	$gui_comp = $options_gui.gui_comp_lkup
@@ -134,9 +167,123 @@ fn handle_options_events($options_gui){
 			check_box_forced_off($gui_comp.otmz_normal_cb)
 			$options_gui.export_as_radio_btn_state = 2
 		}
+
+		generate_message_guide($options_gui)
     }
 }
 
+// *********************************************************************************************
+// Display descriptions of the controllers when the mouse reach to cetain locations
+// 
+// Input: 
+//   - $text_box_button: button object, 
+//	 - $label          : label object
+// Behavior: 
+//   - call the native text editing dialog
+//   - generate the trimmed version of file path for display
+//   - store the actual data in str_full instead of str, at the same child level 
+//
+// ********************************************************************************************* 
+fn generate_message_guide($options_gui){
+
+	$gui_comp = $options_gui.gui_comp_lkup
+	$current_x = EVT[ EVT_X ]
+	$current_y = EVT[ EVT_Y ]
+
+	// I have to use the evil "goto" here because pixilang has no "else if",
+	// which can reduces any unecessary condition check
+	// or to reduce the layer of nesting scope.
+	// While this works, I will find a solution to make the following implementation looks more elegent.
+
+	if effective_component_region_check ($current_x, $current_y, $gui_comp.input_path_text_box) {
+		$gui_comp.msg_box_text.text = APP_MSGS.IN_PATH_TXT_BOX
+		goto SC_EVALUATION
+
+	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.input_path_load_btn) {
+		$gui_comp.msg_box_text.text = APP_MSGS.IN_PATH_LOAD_BTN
+		goto SC_EVALUATION
+
+	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.input_path_load_btn) {
+		$gui_comp.msg_box_text.text = APP_MSGS.IN_PATH_LOAD_BTN
+		goto SC_EVALUATION
+		
+	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.file_name_text_box) {
+		$gui_comp.msg_box_text.text = APP_MSGS.FILE_NAME_TXT_BOX
+		goto SC_EVALUATION
+		
+	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.output_path_text_box) {
+		$gui_comp.msg_box_text.text = APP_MSGS.OUT_PATH_TXT_BOX
+		goto SC_EVALUATION
+		
+	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.output_path_load_btn) {
+		$gui_comp.msg_box_text.text = APP_MSGS.OUT_PATH_LOAD_BTN
+		goto SC_EVALUATION
+		
+	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.export_as_cards_cb) {
+		$gui_comp.msg_box_text.text = APP_MSGS.EXPORT_PATCH_CARDS
+		goto SC_EVALUATION
+		
+	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.export_as_banks_cb) {
+		$gui_comp.msg_box_text.text = APP_MSGS.EXPORT_PATCH_BANKS
+		goto SC_EVALUATION
+		
+	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.otmz_none_cb) {
+		$gui_comp.msg_box_text.text = APP_MSGS.OTMZ_LV_NONE
+		goto SC_EVALUATION
+		
+	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.otmz_normal_cb) {
+		$gui_comp.msg_box_text.text = APP_MSGS.OTMZ_LV_NORMAL
+		goto SC_EVALUATION
+		
+	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.otmz_aggressive_cb) {
+		$gui_comp.msg_box_text.text = APP_MSGS.OTMZ_LV_AGGRESSIVE
+		goto SC_EVALUATION
+		
+	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.export_btn) {
+		$gui_comp.msg_box_text.text = APP_MSGS.EXPORT_BTN
+		goto SC_EVALUATION
+		
+	} else {
+		$gui_comp.msg_box_text.text = APP_MSGS.INFO
+
+	}
+	
+	SC_EVALUATION:		//This stands for Short Circult Evaluation, and this label jump tries to simulate the "else if" behavior
+	
+}
+
+fn effective_component_region_check ($current_x, $current_y, $components){
+	
+	$x_start = $components.x
+	$x_end   = $x_start + $components.w
+
+	$y_start = $components.y
+	$y_end   = $y_start + $components.h
+
+	ret (effective_direct_region_check($current_x, $current_y, $x_start, $x_end, $y_start, $y_end))
+}
+
+fn effective_direct_region_check ($current_x, $current_y, $x_start, $x_end, $y_start, $y_end){
+	if $current_x >= $x_start && $current_x <= $x_end 
+	  && $current_y >= $y_start && $current_y <= $y_end {
+		ret (1)
+	}else {
+		ret (0)
+	}
+}
+
+// *********************************************************************************************
+// edit text from text input
+// 
+// Input: 
+//   - $text_box_button: button object, 
+//	 - $label          : label object
+// Behavior: 
+//   - call the native text editing dialog
+//   - generate the trimmed version of file path for display
+//   - store the actual data in str_full instead of str, at the same child level 
+//
+// ********************************************************************************************* 
 fn click_and_edit_text ($text_box_button, $label){
 
     $modified_text = textinput_dialog ($text_box_button.children[0].str_full, $label)
@@ -146,6 +293,19 @@ fn click_and_edit_text ($text_box_button, $label){
 	click_event_has_sent($text_box_button)
 }
 
+// *********************************************************************************************
+// Load path from file dialog
+// 
+// Input: 
+//	 - $load_button	   : button object, 
+//   - $text_box_button: button object, 
+//	 - $label          : label object
+// Behavior: 
+//   - call the native file dialog
+//   - generate the trimmed version of file path for display
+//   - store the actual data in str_full instead of str, at the same child level 
+//
+// ********************************************************************************************* 
 fn click_and_pick_file ($load_button, $text_box_button, $label) {
 
 	$file_path = file_dialog($label, "", $label, "")
@@ -155,6 +315,15 @@ fn click_and_pick_file ($load_button, $text_box_button, $label) {
 	click_event_has_sent($load_button)
 }
 
+// *********************************************************************************************
+// Trim strings that is way too long for display
+// 
+// Input: 
+//   - $modified_text: String Container, 
+// Behavior: 
+//   - if the string contains more than 60 characters, only the last 60 characters will be kept,
+//     and the head of string will be replaced by "..."
+// ********************************************************************************************* 
 fn trim_long_string ($modified_text){
 
 	if strlen($modified_text) >= 60 {

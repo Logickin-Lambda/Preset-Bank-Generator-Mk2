@@ -2,7 +2,7 @@
 // Preset bank generator mk2
 // 
 // We (Acheney and Logickin) decided to make use of pixilang to build a program,
-// to provide an eco-system for managing presents, with maximizing the advantage of the reset standards:
+// to provide an eco-system for managing presents, with maximizing the advantage of the preset standards:
 // 
 // Including:
 // - Patch Cards: Inspired by the accipiter preset module, Acheney expended the functionality
@@ -23,6 +23,8 @@
 	include "lib/utils/show_log.pixi"
 	include "lib/utils/vector.pixi"
 
+	include "lib/lkups/app_msgs.pixi"
+
 	include "lib/gui/components/color_utils.pixi"
 	include "lib/gui/components/GUI.pixi"
 	include "lib/gui/components/button.pixi"
@@ -35,16 +37,12 @@
 // main program, containing:
 
 // 1. Start of the program, loading config if necessary, and
-//    Loading any SunVox instance here, and these should be the only global objects
-
-	logf("Hello World")
+//    Loading any global instance here, this is where SunVox instances and Lookup tables should be located
+	APP_MSGS = app_msgs_lkup_new()
 	
-
-
-
+	
+	
 // 2. Function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
-// GUIs are also exceptions for global variable since the objects cannot be returned from function for some reason
-
 	$options_gui = construct_preset_converter_options_gui()
 
 	while $options_gui.children[17].has_clicked == 0 {

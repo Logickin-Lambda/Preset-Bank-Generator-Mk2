@@ -190,7 +190,7 @@ fn generate_message_guide($options_gui){
 	$current_x = EVT[ EVT_X ]
 	$current_y = EVT[ EVT_Y ]
 
-	// I have to use the evil "goto" here because pixilang has no "else if",
+	// I have to use the evil "goto" here because pixilang has no "else if", switch case or pattern matching,
 	// which can reduces any unecessary condition check
 	// or to reduce the layer of nesting scope.
 	// While this works, I will find a solution to make the following implementation looks more elegent.

@@ -1,0 +1,58 @@
+POPUP_INFO      = 0
+POPUP_WARNING   = 1
+POPUP_ERROR     = 2
+POPUP_SUCCESS   = 3
+
+// *********************************************************************************************
+// Construct the popups 
+// 
+// Input: 
+//   - $messages in vector container
+//   - $type (based on constants at the top of this pixi file)
+// Output: 
+//   - GUI container that represents the whole setting page, containing
+// 	   - all the interactive components
+// 	   - a look up table for accessing component simipler, without seeking the array index
+// 	   - additional controller state for customized behaviors 
+//
+// ********************************************************************************************* 
+fn construct_preset_popup ($messages, $type){
+
+    // define the color and the size of the popup
+    $color  = COLOR_LIGHT
+    $header = "Info" 
+
+    if $type == POPUP_WARNING {
+        $color = COLOR_WARNING
+        $header = "Warning"
+        goto ELSE_IF_TYPE
+
+    } /*else*/ if $type == POPUP_ERROR {
+        $color = COLOR_DANGER
+        $header = "Error"
+        goto ELSE_IF_TYPE
+
+    } /*else*/ if $type == POPUP_SUCCESS {
+        $color = COLOR_SUCCESS
+        $header = "Success"
+        goto ELSE_IF_TYPE
+
+    } 
+    ELSE_IF_TYPE:
+
+    $row_size = $messages.size
+
+    $popup = GUI_new( -1, //parent
+                    -0, -0, //x, y position
+                    0, 0, //width, height
+                    BLACK, 0, //color, transparency
+                    -1 //texture
+                    )
+
+    $popup.children[0] = gui_window_frame_new($popup, 0, 0, 400, 600, $header, $color)
+	$popup.gui_comp_lkup.popup_border = $popup.children[0]
+
+
+    ret($popup)
+
+}

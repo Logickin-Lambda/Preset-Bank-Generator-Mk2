@@ -1,0 +1,49 @@
+ASCII_HORIZONTAL_TAB    = 9
+ASCII_NEW_LINE          = 10
+ASCII_VERTICAL_TAB      = 11
+ASCII_FROM_FEED         = 12
+ASCII_CARRIAGE_RETURN   = 13
+ASCII_SPACE             = 32
+
+fn string_is_blank($string){
+    ret(!string_is_not_blank($string))
+}
+
+fn string_is_not_blank($string){
+
+    $str_length = strlen($string)
+
+    if $str_length <= 0 {
+        ret(0)
+    } 
+
+    ret(check_white_space_of_a_string($string))
+}
+
+fn check_white_space_of_a_string($string){
+    for ($i = 0; $i < $strlen($string); i + 1){
+        $character = $string [i]
+
+        if  $character == ASCII_HORIZONTAL_TAB ||
+            $character == ASCII_NEW_LINE ||
+            $character == ASCII_VERTICAL_TAB ||
+            $character == ASCII_FROM_FEED ||
+            $character == ASCII_CARRIAGE_RETURN ||
+            $character == ASCII_SPACE {
+            
+            continue
+        } else {
+            ret (1)  // non-white space found, return true
+        }
+    }
+    ret (0) 
+}
+
+fn safe_strcat($string_a, $string_b) {
+    $temp_str = ""
+    $temp_str[0] = 0
+    strcat($temp_str, $string_a)
+    strcat($temp_str, $string_b)
+
+    ret ($temp_str)
+}

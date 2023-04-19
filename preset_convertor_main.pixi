@@ -20,53 +20,62 @@
 // *************************************************************************************************************
 
 // pixi file dependencies
-	include "lib/utils/show_log.pixi"
-	include "lib/utils/vector.pixi"
+include "lib/utils/show_log.pixi"
+include "lib/utils/vector.pixi"
 
-	include "lib/lkups/app_msgs.pixi"
+include "lib/lkups/app_msgs.pixi"
 
-	include "lib/gui/components/color_utils.pixi"
-	include "lib/gui/components/GUI.pixi"
-	include "lib/gui/components/button.pixi"
-	include "lib/gui/components/checkbox.pixi"
-	include "lib/gui/components/gui_window_frame.pixi"
-	include "lib/gui/components/text_message.pixi"
-	include "lib/gui/preset_converter_options.pixi"
+include "lib/gui/components/color_utils.pixi"
+include "lib/gui/components/GUI.pixi"
+include "lib/gui/components/button.pixi"
+include "lib/gui/components/checkbox.pixi"
+include "lib/gui/components/gui_window_frame.pixi"
+include "lib/gui/components/text_message.pixi"
+include "lib/gui/popup.pixi"
+include "lib/gui/preset_converter_options.pixi"
+include "lib/gui/preset_converter_paging_flow.pixi"
+
+include "lib/validations/preset_converter_options_validator.pixi"
 
 
-// main program, containing:
 
 // 1. Start of the program, loading config if necessary, and
 //    Loading any global instance here, this is where SunVox instances and Lookup tables should be located
-	APP_MSGS = app_msgs_lkup_new()
+APP_MSGS = app_msgs_lkup_new()
+
+
+
+main() halt 
+
+fn main(){
+	// main program, containing:
+
+
 	
-	
-	
-// 2. Function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
+	// 2. Function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
 	$options_gui = construct_preset_converter_options_gui()
+	$page_index = 0
 
-	while $options_gui.children[17].has_clicked == 0 {
-		clear()
+	// Main event loop
+	while 1 {
+		display_settings_and_validation($options_gui)
 
-		$options_gui.draw( $options_gui )
-		handle_options_events($options_gui)
+		// 3&4. Function calls for file extractions and validations
 
-		frame()
+			// Function calls...
+
+
+		// 5&6: Function calls for generating and exporting presets
+
+			// Function calls...
+
+
+		// 7. function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
+
+			// Function calls...
+
+
 	}
 
-
-// 3&4. Function calls for file extractions and validations
-
-	// Function calls...
-
-
-// 5&6: Function calls for generating and exporting presets
-
-	// Function calls...
-
-
-// 7. function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
-
-	// Function calls...
-
 	show_log()	// This is only for debug purpose
+}

@@ -1,0 +1,36 @@
+fn display_settings_and_validation($options_gui){
+
+    $has_validated = 0              // 0 = not yet validated; 1 = has been validated
+    $error         = vec_new(INT8)  // 0 = fail; 1 = pass
+
+    $error_popup   = new()
+    $warning_popup = new()
+
+    while 1 {
+        clear()
+
+        if $options_gui.gui_comp.export_btn.has_clicked == 0 {
+			$options_gui.draw( $options_gui )
+			handle_options_events($options_gui)
+		}
+        
+        if $options_gui.gui_comp.export_btn.has_clicked == 1 && $has_validated == 0 {
+            $error = process_preset_converter_options_validator( $options_gui )
+
+            if $error.size > 0 {
+                $error_popup = construct_preset_popup($error, POPUP_ERROR)
+            } else {
+                $error_popup = construct_preset_popup($error, POPUP_SUCCESS)
+            }
+
+            $has_validated = 1
+        }
+
+        if $has_validated == 1 && $error.size > 0{
+            $error_popup.draw( $error_popup )
+        } else {
+            $error_popup.draw( $error_popup )
+        }
+        frame()
+    }
+}

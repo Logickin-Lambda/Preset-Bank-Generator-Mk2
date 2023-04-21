@@ -16,8 +16,13 @@ fn app_msgs_lkup_new(){
     $APP_MSGS_LKUP.EXPORT_BTN           = "Click here to export your presets, \n\nand it will takes you to a popup of confrimation.\n\nOnce the export action has been confrimed,\n\nthe program will perform a series of validation for your inputs;\n\nif the validation passed, the process continues; otherwise,\n\nan error popup will be shown, and you will be redirected to this page."
     
     // pop up message
-    $APP_MSGS_LKUP.ERR_MISSING          = "Missing "
-    $APP_MSGS_LKUP.ERR_MISSING_CB       = "At least one must be chosen for "
+    $APP_MSGS_LKUP.ERR_MISSING_INPUT    = "Missing Input Path"
+    $APP_MSGS_LKUP.ERR_MISSING_FILE_NAME= "Missing File Name"
+    $APP_MSGS_LKUP.ERR_MISSING_OUTPUT   = "Missing Output Path"
+    $APP_MSGS_LKUP.ERR_MISSING_CB_EXPORT= "At least one Export format must be chosen"
+    $APP_MSGS_LKUP.ERR_MISSING_CB_OTMZ  = "At least one Optimization mode must be chosen"
+
+    $APP_MSGS_LKUP.WARNING_PRECEED      = "Are you sure to start the convertion?"
 
     ret ($APP_MSGS_LKUP)
 }

@@ -22,6 +22,7 @@
 // pixi file dependencies
 include "lib/utils/show_log.pixi"
 include "lib/utils/vector.pixi"
+include "lib/utils/string_utils.pixi"
 
 include "lib/lkups/app_msgs.pixi"
 
@@ -33,7 +34,7 @@ include "lib/gui/components/gui_window_frame.pixi"
 include "lib/gui/components/text_message.pixi"
 include "lib/gui/popup.pixi"
 include "lib/gui/preset_converter_options.pixi"
-include "lib/gui/preset_converter_paging_flow.pixi"
+include "lib/gui/preset_converter_paging_logic.pixi"
 
 include "lib/validations/preset_converter_options_validator.pixi"
 
@@ -73,8 +74,6 @@ fn main(){
 		// 7. function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
 
 			// Function calls...
-
-
 	}
 
 	show_log()	// This is only for debug purpose

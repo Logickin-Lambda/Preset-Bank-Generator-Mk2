@@ -21,7 +21,7 @@ fn string_is_not_blank($string){
 }
 
 fn check_white_space_of_a_string($string){
-    for ($i = 0; $i < $strlen($string); i + 1){
+    for ($i = 0; $i < strlen($string); i + 1){
         $character = $string [i]
 
         if  $character == ASCII_HORIZONTAL_TAB ||
@@ -37,13 +37,4 @@ fn check_white_space_of_a_string($string){
         }
     }
     ret (0) 
-}
-
-fn safe_strcat($string_a, $string_b) {
-    $temp_str = ""
-    $temp_str[0] = 0
-    strcat($temp_str, $string_a)
-    strcat($temp_str, $string_b)
-
-    ret ($temp_str)
 }

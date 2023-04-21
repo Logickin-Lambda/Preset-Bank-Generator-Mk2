@@ -21,24 +21,32 @@ fn construct_preset_popup ($messages, $type){
     // define the color and the size of the popup
     $color  = COLOR_LIGHT
     $header = "Info" 
+    $confrim_button_name = "OK"
 
-    if $type == POPUP_WARNING {
-        $color = COLOR_WARNING
-        $header = "Warning"
-        goto ELSE_IF_TYPE
+    while 1 {
+        if $type == POPUP_WARNING {
+            $color = COLOR_WARNING
+            $header = "Warning"
+            $confrim_button_name = "Confirm"
+            break
 
-    } /*else*/ if $type == POPUP_ERROR {
-        $color = COLOR_DANGER
-        $header = "Error"
-        goto ELSE_IF_TYPE
+        } /*else*/ if $type == POPUP_ERROR {
+            $color = COLOR_DANGER
+            $header = "Error"
+            $confrim_button_name = "Back"
+            break
 
-    } /*else*/ if $type == POPUP_SUCCESS {
-        $color = COLOR_SUCCESS
-        $header = "Success"
-        goto ELSE_IF_TYPE
+        } /*else*/ if $type == POPUP_SUCCESS {
+            $color = COLOR_SUCCESS
+            $header = "Success"
+            $confrim_button_name = "OK"
+            break
 
-    } 
-    ELSE_IF_TYPE:
+        } else {
+            break
+        }
+        
+    }
 
     $row_size = $messages.size
 
@@ -48,11 +56,62 @@ fn construct_preset_popup ($messages, $type){
                     BLACK, 0, //color, transparency
                     -1 //texture
                     )
+    
 
-    $popup.children[0] = gui_window_frame_new($popup, 0, 0, 400, 600, $header, $color)
+    // render border
+    $popup.children[0] = gui_window_frame_new($popup, 0, 0, 450, 120 + ($row_size * 20), $header, $color)
 	$popup.gui_comp_lkup.popup_border = $popup.children[0]
 
+    // render text message
+    $popup.children[1] = text_message_new($popup, 0, 0, "", COLOR_LIGHT)
+    GUI_add_text($popup.children[1])
+    $popup.gui_comp_lkup.popup_border_text = $popup.children[1].str[0]
+
+    $message_log = ""
+    for ($i = 0; $i < $messages.size; $i + 1){
+        strcat($message_log , $messages[$i])
+        strcat($message_log , "\n\n")
+    }
+
+    $popup.gui_comp_lkup.popup_border_text.text = $message_log
+	$popup.gui_comp_lkup.popup_border_text.x - 200
+	$popup.gui_comp_lkup.popup_border_text.y - (10 + ($row_size * 10))
+	$popup.gui_comp_lkup.popup_border_text.flags = 0b00000101 
+	$popup.gui_comp_lkup.popup_border_text.color = COLOR_LIGHT
+    
+    $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confrim_button_name, $color)
+    $popup.gui_comp_lkup.button_confirm = $popup.children[2]
+
+    if $type == POPUP_WARNING {
+        $popup.children[3] = button_new($popup, 0, 10 + ($row_size * 8), "Cancel", COLOR_SECONDARY)
+        $popup.gui_comp_lkup.button_cancel = $popup.children[3]
+
+    }
 
     ret($popup)
+}
 
+
+// *********************************************************************************************
+// Process the behavior of the GUI
+// 
+// Input   : 
+//   - $popup_gui: GUI container
+// behavior: 
+// 	 - callback on button clicks
+// 	 - radio button actions
+// 	 - calling native text editor and file dialogs
+//
+// ********************************************************************************************* 
+fn handle_popup_events($popup_gui){
+
+	$gui_comp = $popup_gui.gui_comp_lkup
+
+    while get_event()
+    {
+        if EVT[ EVT_TYPE ] == EVT_QUIT { halt }
+        $popup_gui.check( $popup_gui ) //call check function
+        $popup_gui.evt( $popup_gui ) //call interaction handler
+
+    }
 }

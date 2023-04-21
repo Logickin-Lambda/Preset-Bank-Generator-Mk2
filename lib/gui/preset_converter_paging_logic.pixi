@@ -8,7 +8,7 @@ fn display_settings_and_validation($options_gui){
 
     while 1 {
         clear()
-
+        
         if $options_gui.gui_comp.export_btn.has_clicked == 0 {
 			$options_gui.draw( $options_gui )
 			handle_options_events($options_gui)
@@ -20,7 +20,9 @@ fn display_settings_and_validation($options_gui){
             if $error.size > 0 {
                 $error_popup = construct_preset_popup($error, POPUP_ERROR)
             } else {
-                $error_popup = construct_preset_popup($error, POPUP_SUCCESS)
+                $warning_message = vec_new(INT8);
+                $warning_message.push ($warning_message, APP_MSGS.WARNING_PRECEED)
+                $warning_popup = construct_preset_popup($warning_message, POPUP_WARNING)
             }
 
             $has_validated = 1
@@ -28,9 +30,12 @@ fn display_settings_and_validation($options_gui){
 
         if $has_validated == 1 && $error.size > 0{
             $error_popup.draw( $error_popup )
+            handle_popup_events($error_popup)
         } else {
-            $error_popup.draw( $error_popup )
+            $warning_popup.draw( $warning_popup )
+            handle_popup_events($warning_popup)
         }
+
         frame()
     }
 }

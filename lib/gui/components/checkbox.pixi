@@ -42,8 +42,6 @@ fn check_box_new ($parent, $xpos, $ypos, $label, $state, $color) {
         }else{
             $indicator.transp = 160
         }
-
-        
     }
 
     $check_box_clickable.onleave = {  

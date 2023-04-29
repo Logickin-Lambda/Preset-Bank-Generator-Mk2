@@ -68,6 +68,7 @@ fn construct_preset_popup ($messages, $type){
     $popup.gui_comp_lkup.popup_border_text = $popup.children[1].str[0]
 
     $message_log = ""
+    $message_log[0] = 0
     for ($i = 0; $i < $messages.size; $i + 1){
         strcat($message_log , $messages[$i])
         strcat($message_log , "\n\n")
@@ -79,14 +80,35 @@ fn construct_preset_popup ($messages, $type){
 	$popup.gui_comp_lkup.popup_border_text.flags = 0b00000101 
 	$popup.gui_comp_lkup.popup_border_text.color = COLOR_LIGHT
     
-    $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confrim_button_name, $color)
-    $popup.gui_comp_lkup.button_confirm = $popup.children[2]
+    while 1 {
+        if $type == POPUP_WARNING {
+            $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confrim_button_name, $color)
+            $popup.gui_comp_lkup.button_confirm = $popup.children[2]
 
-    if $type == POPUP_WARNING {
-        $popup.children[3] = button_new($popup, 0, 10 + ($row_size * 8), "Cancel", COLOR_SECONDARY)
-        $popup.gui_comp_lkup.button_cancel = $popup.children[3]
+            $popup.children[3] = button_new($popup, 0, 10 + ($row_size * 8), "Cancel", COLOR_SECONDARY)
+            $popup.gui_comp_lkup.button_cancel = $popup.children[3]
+            break
 
+        } /*else*/ if $type == POPUP_ERROR {
+            $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confrim_button_name, $color)
+            $popup.gui_comp_lkup.button_cancel = $popup.children[2]
+
+            $popup.gui_comp_lkup.button_confirm.has_clicked = 0
+            break
+
+        } else{
+            $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confrim_button_name, $color)
+            $popup.gui_comp_lkup.button_confirm = $popup.children[2]
+
+            $popup.gui_comp_lkup.button_cancel.has_clicked = 0
+            break
+
+        }
     }
+
+
+
+
 
     ret($popup)
 }

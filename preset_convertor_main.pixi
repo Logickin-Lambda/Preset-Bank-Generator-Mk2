@@ -51,8 +51,6 @@ main() halt
 fn main(){
 	// main program, containing:
 
-
-	
 	// 2. Function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
 	$options_gui = construct_preset_converter_options_gui()
 	$page_index = 0
@@ -62,18 +60,15 @@ fn main(){
 		display_settings_and_validation($options_gui)
 
 		// 3&4. Function calls for file extractions and validations
-
-			// Function calls...
-
+		// Function calls...
 
 		// 5&6: Function calls for generating and exporting presets
-
-			// Function calls...
-
+		// Function calls...
 
 		// 7. function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
+		// Function calls...
 
-			// Function calls...
+		break; // Temporary, well be removed once other part of the code have completed
 	}
 
 	show_log()	// This is only for debug purpose

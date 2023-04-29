@@ -1,10 +1,9 @@
 fn display_settings_and_validation($options_gui){
 
     $has_validated = 0              // 0 = not yet validated; 1 = has been validated
-    $error         = vec_new(INT8)  // 0 = fail; 1 = pass
+    $error         = vec_new(INT8)
 
-    $error_popup   = new()
-    $warning_popup = new()
+    $popup   = new()
 
     while 1 {
         clear()
@@ -16,26 +15,43 @@ fn display_settings_and_validation($options_gui){
         
         if $options_gui.gui_comp.export_btn.has_clicked == 1 && $has_validated == 0 {
             $error = process_preset_converter_options_validator( $options_gui )
-
-            if $error.size > 0 {
-                $error_popup = construct_preset_popup($error, POPUP_ERROR)
-            } else {
-                $warning_message = vec_new(INT8);
-                $warning_message.push ($warning_message, APP_MSGS.WARNING_PRECEED)
-                $warning_popup = construct_preset_popup($warning_message, POPUP_WARNING)
-            }
+            $popup = create_popup_based_on_error($error)
 
             $has_validated = 1
         }
 
-        if $has_validated == 1 && $error.size > 0{
-            $error_popup.draw( $error_popup )
-            handle_popup_events($error_popup)
-        } else {
-            $warning_popup.draw( $warning_popup )
-            handle_popup_events($warning_popup)
+        if $has_validated == 1{
+            $popup.draw( $popup )
+            handle_popup_events($popup)
+        }
+
+        if $has_validated == 1 && $popup.gui_comp_lkup.button_cancel.has_clicked == 1{
+            // back from popup, return to option
+            $options_gui.gui_comp.export_btn.has_clicked = 0
+            $options_gui.gui_comp.popup_border_text.text = ""
+            $has_validated = 0
+            $popup   = new()
+        }
+
+        if $has_validated == 1 && $popup.gui_comp_lkup.button_confirm.has_clicked == 1{
+            // Exit the loop, and process the conversion
+            $has_validated == 0
+            break;
         }
 
         frame()
     }
+}
+
+fn create_popup_based_on_error($error){
+    if $error.size > 0 {
+        $error_popup = construct_preset_popup($error, POPUP_ERROR)
+        ret($error_popup)
+
+    } else {
+        $warning_message = vec_new(INT8);
+        $warning_message.push ($warning_message, APP_MSGS.WARNING_PRECEED)
+        $warning_popup = construct_preset_popup($warning_message, POPUP_WARNING)
+        ret($warning_popup)
+    }   
 }

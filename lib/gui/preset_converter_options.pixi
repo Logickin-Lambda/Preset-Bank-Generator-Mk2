@@ -17,78 +17,131 @@ fn construct_preset_converter_options_gui () {
                     BLACK, 0, //color, transparency
                     -1 //texture
                     )
+
+	$options_gui.gui_ptr = 0
     
-    $options_gui.children[0] = gui_window_frame_new($options_gui, 0, 0, 800, 600, "Preset Generator", COLOR_DEFAULT)
-	$options_gui.gui_comp_lkup.app_border = $options_gui.children[0]
+    $options_gui.children[$options_gui.gui_ptr] = gui_window_frame_new($options_gui, 0, 0, 800, 600, "Preset Generator", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.app_border = $options_gui.children[$options_gui.gui_ptr]
+	$options_gui.gui_ptr + 1
+
+    // Build the main complex components 
+	build_input_path_input($options_gui)
+	build_output_folder_name($options_gui)
+	// build_output_path_input($options_gui)
+	build_export_as_check_box($options_gui)
+	build_optimization_radio_button($options_gui)
+	build_message_box($options_gui)
+
+    // Export button
+    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, 275, 240, "Export", COLOR_INFO)
+	$options_gui.gui_comp_lkup.export_btn = $options_gui.children[$options_gui.gui_ptr]
+	$options_gui.gui_ptr + 1
+
+	// define control state
+	$options_gui.export_as_radio_btn_state = 1
+
+
+    ret($options_gui)
+}
+
+fn build_input_path_input($options_gui){
 
     // Input Path:
-    $options_gui.children[1] = text_message_new($options_gui, -290, -230, "Input Path:", COLOR_DEFAULT)
-	$options_gui.gui_comp_lkup.input_path_label = $options_gui.children[1].str[0].text
+    $options_gui.children[$options_gui.gui_ptr] = text_message_new($options_gui, -290, -230, "Input Path:", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.input_path_label = $options_gui.children[$options_gui.gui_ptr].str[0].text
+	$options_gui.gui_ptr + 1
 
-    $options_gui.children[2] = button_new($options_gui, -280, -245, "", COLOR_SECONDARY)
-    $options_gui.children[2].w = 550
-    $options_gui.children[2].children[0].w = 544
-    $options_gui.children[2].children[0].str[ 0 ].x - 40
-    $options_gui.children[2].children[0].str[ 0 ].flags = 0b00000100
-	$options_gui.gui_comp_lkup.input_path_text_box = $options_gui.children[2]
+    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, -280, -245, "", COLOR_SECONDARY)
+    $options_gui.children[$options_gui.gui_ptr].w = 550
+    $options_gui.children[$options_gui.gui_ptr].children[0].w = 544
+    $options_gui.children[$options_gui.gui_ptr].children[0].str[ 0 ].x - 40
+    $options_gui.children[$options_gui.gui_ptr].children[0].str[ 0 ].flags = 0b00000100
+	$options_gui.gui_comp_lkup.input_path_text_box = $options_gui.children[$options_gui.gui_ptr]
+	$options_gui.gui_ptr + 1
 
-    $options_gui.children[3] = button_new($options_gui, 275, -245, "Load", COLOR_INFO)
-	$options_gui.gui_comp_lkup.input_path_load_btn = $options_gui.children[3]
+    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, 275, -245, "Load", COLOR_INFO)
+	$options_gui.gui_comp_lkup.input_path_load_btn = $options_gui.children[$options_gui.gui_ptr]
+	$options_gui.gui_ptr + 1
+}
 
+fn build_output_folder_name($options_gui){
     // File Name:
-    $options_gui.children[4] = text_message_new($options_gui, -290, -180, "File Name:", COLOR_DEFAULT)
-	$options_gui.gui_comp_lkup.file_name_label = $options_gui.children[4].str[0].text
+    $options_gui.children[$options_gui.gui_ptr] = text_message_new($options_gui, -290, -180, "File Name:", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.file_name_label = $options_gui.children[$options_gui.gui_ptr].str[0].text
+	$options_gui.gui_ptr + 1
 
 
-    $options_gui.children[5] = button_new($options_gui, -280, -195, "", COLOR_SECONDARY)
-    $options_gui.children[5].w = 550
-    $options_gui.children[5].children[0].w = 544
-    $options_gui.children[5].children[0].str[ 0 ].x - 40
-    $options_gui.children[5].children[0].str[ 0 ].flags = 0b00000100
-	$options_gui.gui_comp_lkup.file_name_text_box = $options_gui.children[5]
+    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, -280, -195, "", COLOR_SECONDARY)
+    $options_gui.children[$options_gui.gui_ptr].w = 550
+    $options_gui.children[$options_gui.gui_ptr].children[0].w = 544
+    $options_gui.children[$options_gui.gui_ptr].children[0].str[ 0 ].x - 40
+    $options_gui.children[$options_gui.gui_ptr].children[0].str[ 0 ].flags = 0b00000100
+	$options_gui.gui_comp_lkup.file_name_text_box = $options_gui.children[$options_gui.gui_ptr]
+	$options_gui.gui_ptr + 1
+}
 
-    // Output Path:
-    $options_gui.children[6] = text_message_new($options_gui, -290, -130, "Output Path:", COLOR_DEFAULT)
-	$options_gui.gui_comp_lkup.output_path_label = $options_gui.children[6].str[0].text
+fn build_output_path_input($options_gui){
+	// Output Path:
+    $options_gui.children[$options_gui.gui_ptr] = text_message_new($options_gui, -290, -130, "Output Path:", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.output_path_label = $options_gui.children[$options_gui.gui_ptr].str[0].text
+	$options_gui.gui_ptr + 1
 
-    $options_gui.children[7] = button_new($options_gui, -280, -145, "", COLOR_SECONDARY)
-    $options_gui.children[7].w = 550
-    $options_gui.children[7].children[0].w = 544
-    $options_gui.children[7].children[0].str[ 0 ].x - 40
-    $options_gui.children[7].children[0].str[ 0 ].flags = 0b00000100
-	$options_gui.gui_comp_lkup.output_path_text_box = $options_gui.children[7]
+    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, -280, -145, "", COLOR_SECONDARY)
+    $options_gui.children[$options_gui.gui_ptr].w = 550
+    $options_gui.children[$options_gui.gui_ptr].children[0].w = 544
+    $options_gui.children[$options_gui.gui_ptr].children[0].str[ 0 ].x - 40
+    $options_gui.children[$options_gui.gui_ptr].children[0].str[ 0 ].flags = 0b00000100
+	$options_gui.gui_comp_lkup.output_path_text_box = $options_gui.children[$options_gui.gui_ptr]
+	$options_gui.gui_ptr + 1
 
-    $options_gui.children[8] = button_new($options_gui, 275, -145, "Load", COLOR_INFO)
-	$options_gui.gui_comp_lkup.output_path_load_btn = $options_gui.children[8]
+    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, 275, -145, "Load", COLOR_INFO)
+	$options_gui.gui_comp_lkup.output_path_load_btn = $options_gui.children[$options_gui.gui_ptr]
+	$options_gui.gui_ptr + 1
+}
 
+fn build_export_as_check_box($options_gui){
     // Export Options:
-    $options_gui.children[9]  = text_message_new($options_gui, -290, -80, "Export AS:", COLOR_DEFAULT)
-    $options_gui.children[10] = check_box_new($options_gui, -280, -90, "Patch Cards", CHECKBOX_ON, COLOR_DEFAULT)
-    $options_gui.children[11] = check_box_new($options_gui, -120, -90, "Compressed Patch Banks", CHECKBOX_ON, COLOR_DEFAULT)
+    $options_gui.children[$options_gui.gui_ptr]  = text_message_new($options_gui, -290, -80, "Export AS:", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.export_as_label = $options_gui.children[$options_gui.gui_ptr].str[0].text
+	$options_gui.gui_ptr + 1
 
-	$options_gui.gui_comp_lkup.export_as_label = $options_gui.children[9].str[0].text
-	$options_gui.gui_comp_lkup.export_as_cards_cb = $options_gui.children[10]
-	$options_gui.gui_comp_lkup.export_as_banks_cb = $options_gui.children[11]
+    $options_gui.children[$options_gui.gui_ptr] = check_box_new($options_gui, -280, -90, "Patch Cards", CHECKBOX_ON, COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.export_as_cards_cb = $options_gui.children[$options_gui.gui_ptr]
+	$options_gui.gui_ptr + 1
 
+    $options_gui.children[$options_gui.gui_ptr] = check_box_new($options_gui, -120, -90, "Compressed Patch Banks", CHECKBOX_ON, COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.export_as_banks_cb = $options_gui.children[$options_gui.gui_ptr]	
+	$options_gui.gui_ptr + 1
+}
+
+fn build_optimization_radio_button($options_gui){
     // Storage Optimization
-    $options_gui.children[12] = text_message_new($options_gui, -290, -30, "Optimization:", COLOR_DEFAULT)
-    $options_gui.children[13] = check_box_new($options_gui, -280, -40, "None", CHECKBOX_OFF, COLOR_DEFAULT)
-    $options_gui.children[14] = check_box_new($options_gui, -120, -40, "Normal", CHECKBOX_ON, COLOR_DEFAULT)
-    $options_gui.children[15] = check_box_new($options_gui, 40, -40, "Aggressive (Unstable)", CHECKBOX_OFF, COLOR_DANGER)
+    $options_gui.children[$options_gui.gui_ptr] = text_message_new($options_gui, -290, -30, "Optimization:", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.otmz_label = $options_gui.children[$options_gui.gui_ptr].str[0].text
+	$options_gui.gui_ptr + 1
 
-	$options_gui.gui_comp_lkup.otmz_label = $options_gui.children[12].str[0].text
-	$options_gui.gui_comp_lkup.otmz_none_cb = $options_gui.children[13]
-	$options_gui.gui_comp_lkup.otmz_normal_cb = $options_gui.children[14]
-	$options_gui.gui_comp_lkup.otmz_aggressive_cb = $options_gui.children[15]
+    $options_gui.children[$options_gui.gui_ptr] = check_box_new($options_gui, -280, -40, "None", CHECKBOX_OFF, COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.otmz_none_cb = $options_gui.children[$options_gui.gui_ptr]
+	$options_gui.gui_ptr + 1
+
+    $options_gui.children[$options_gui.gui_ptr] = check_box_new($options_gui, -120, -40, "Normal", CHECKBOX_ON, COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.otmz_normal_cb = $options_gui.children[$options_gui.gui_ptr]
+	$options_gui.gui_ptr + 1
+
+    $options_gui.children[$options_gui.gui_ptr] = check_box_new($options_gui, 40, -40, "Aggressive (Unstable)", CHECKBOX_OFF, COLOR_DANGER)
+	$options_gui.gui_comp_lkup.otmz_aggressive_cb = $options_gui.children[$options_gui.gui_ptr]
+	$options_gui.gui_ptr + 1
 
 	$options_gui.gui_comp_lkup.otmz_aggressive_cb.str[0].color = COLOR_DANGER
+}
 
+fn build_message_box($options_gui){
     // Message Box, window frame with 
-    $options_gui.children[16] = gui_window_frame_new($options_gui, 0, 125, 720, 200, "Messages", COLOR_DEFAULT)
-	$options_gui.gui_comp_lkup.msg_box = $options_gui.children[16]
+    $options_gui.children[$options_gui.gui_ptr] = gui_window_frame_new($options_gui, 0, 125, 720, 200, "Messages", COLOR_DEFAULT)
+	$options_gui.gui_comp_lkup.msg_box = $options_gui.children[$options_gui.gui_ptr]
 
-	GUI_add_text($options_gui.children[16].children[0])
-	$options_gui.gui_comp_lkup.msg_box_text = $options_gui.children[16].children[0].str[0]
+	GUI_add_text($options_gui.children[$options_gui.gui_ptr].children[0])
+	$options_gui.gui_comp_lkup.msg_box_text = $options_gui.children[$options_gui.gui_ptr].children[0].str[0]
 
 	$options_gui.gui_comp_lkup.msg_box_text.text = APP_MSGS.INFO
 	$options_gui.gui_comp_lkup.msg_box_text.x - 335
@@ -96,15 +149,7 @@ fn construct_preset_converter_options_gui () {
 	$options_gui.gui_comp_lkup.msg_box_text.flags = 0b00000101 
 	$options_gui.gui_comp_lkup.msg_box_text.color = COLOR_LIGHT
 
-    // Export button
-    $options_gui.children[17] = button_new($options_gui, 275, 240, "Export", COLOR_INFO)
-	$options_gui.gui_comp_lkup.export_btn = $options_gui.children[17]
-
-	// define control state
-	$options_gui.export_as_radio_btn_state = 1
-
-
-    ret($options_gui)
+	$options_gui.gui_ptr + 1
 }
 
 // *********************************************************************************************
@@ -191,66 +236,61 @@ fn generate_message_guide($options_gui){
 	$current_x = EVT[ EVT_X ]
 	$current_y = EVT[ EVT_Y ]
 
-	// I have to use the evil "goto" here because pixilang has no "else if", switch case or pattern matching,
-	// which can reduces any unecessary condition check
-	// or to reduce the layer of nesting scope.
-	// While this works, I will find a solution to make the following implementation looks more elegent.
+	// Ah yes, code repeatition. I need to find a better way to make this code cleaner to read using pixilang.
+	while 1 { 
+		if effective_component_region_check ($current_x, $current_y, $gui_comp.input_path_text_box) {
+			$gui_comp.msg_box_text.text = APP_MSGS.IN_PATH_TXT_BOX
+			break;
 
-	if effective_component_region_check ($current_x, $current_y, $gui_comp.input_path_text_box) {
-		$gui_comp.msg_box_text.text = APP_MSGS.IN_PATH_TXT_BOX
-		goto SC_EVALUATION
+		} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.input_path_load_btn) {
+			$gui_comp.msg_box_text.text = APP_MSGS.IN_PATH_LOAD_BTN
+			break;
 
-	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.input_path_load_btn) {
-		$gui_comp.msg_box_text.text = APP_MSGS.IN_PATH_LOAD_BTN
-		goto SC_EVALUATION
-
-	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.input_path_load_btn) {
-		$gui_comp.msg_box_text.text = APP_MSGS.IN_PATH_LOAD_BTN
-		goto SC_EVALUATION
-		
-	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.file_name_text_box) {
-		$gui_comp.msg_box_text.text = APP_MSGS.FILE_NAME_TXT_BOX
-		goto SC_EVALUATION
-		
-	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.output_path_text_box) {
-		$gui_comp.msg_box_text.text = APP_MSGS.OUT_PATH_TXT_BOX
-		goto SC_EVALUATION
-		
-	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.output_path_load_btn) {
-		$gui_comp.msg_box_text.text = APP_MSGS.OUT_PATH_LOAD_BTN
-		goto SC_EVALUATION
-		
-	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.export_as_cards_cb) {
-		$gui_comp.msg_box_text.text = APP_MSGS.EXPORT_PATCH_CARDS
-		goto SC_EVALUATION
-		
-	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.export_as_banks_cb) {
-		$gui_comp.msg_box_text.text = APP_MSGS.EXPORT_PATCH_BANKS
-		goto SC_EVALUATION
-		
-	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.otmz_none_cb) {
-		$gui_comp.msg_box_text.text = APP_MSGS.OTMZ_LV_NONE
-		goto SC_EVALUATION
-		
-	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.otmz_normal_cb) {
-		$gui_comp.msg_box_text.text = APP_MSGS.OTMZ_LV_NORMAL
-		goto SC_EVALUATION
-		
-	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.otmz_aggressive_cb) {
-		$gui_comp.msg_box_text.text = APP_MSGS.OTMZ_LV_AGGRESSIVE
-		goto SC_EVALUATION
-		
-	} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.export_btn) {
-		$gui_comp.msg_box_text.text = APP_MSGS.EXPORT_BTN
-		goto SC_EVALUATION
-		
-	} else {
-		$gui_comp.msg_box_text.text = APP_MSGS.INFO
-
-	}
-	
-	SC_EVALUATION:		//This stands for Short Circult Evaluation, and this label jump tries to simulate the "else if" behavior
-	
+		} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.input_path_load_btn) {
+			$gui_comp.msg_box_text.text = APP_MSGS.IN_PATH_LOAD_BTN
+			break;
+			
+		} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.file_name_text_box) {
+			$gui_comp.msg_box_text.text = APP_MSGS.FILE_NAME_TXT_BOX
+			break;
+			
+		} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.output_path_text_box) {
+			$gui_comp.msg_box_text.text = APP_MSGS.OUT_PATH_NOT_SUPPORT
+			break;
+			
+		} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.output_path_load_btn) {
+			$gui_comp.msg_box_text.text = APP_MSGS.OUT_PATH_LOAD_BTN
+			break;
+			
+		} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.export_as_cards_cb) {
+			$gui_comp.msg_box_text.text = APP_MSGS.EXPORT_PATCH_CARDS
+			break;
+			
+		} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.export_as_banks_cb) {
+			$gui_comp.msg_box_text.text = APP_MSGS.EXPORT_PATCH_BANKS
+			break;
+			
+		} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.otmz_none_cb) {
+			$gui_comp.msg_box_text.text = APP_MSGS.OTMZ_LV_NONE
+			break;
+			
+		} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.otmz_normal_cb) {
+			$gui_comp.msg_box_text.text = APP_MSGS.OTMZ_LV_NORMAL
+			break;
+			
+		} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.otmz_aggressive_cb) {
+			$gui_comp.msg_box_text.text = APP_MSGS.OTMZ_LV_AGGRESSIVE
+			break;
+			
+		} /*else*/ if effective_component_region_check ($current_x, $current_y, $gui_comp.export_btn) {
+			$gui_comp.msg_box_text.text = APP_MSGS.EXPORT_BTN
+			break;
+			
+		} else {
+			$gui_comp.msg_box_text.text = APP_MSGS.INFO
+			break;
+		}
+	} 
 }
 
 fn effective_component_region_check ($current_x, $current_y, $components){
@@ -328,8 +368,7 @@ fn click_and_pick_file ($load_button, $text_box_button, $label) {
 fn trim_long_string ($modified_text){
 
 	if strlen($modified_text) >= 60 {
-		$temp_str = ""
-		$temp_str[0] = 0
+		$temp_str = string_new()
 		strcat($temp_str, "...")
 		strcat($temp_str, 0, $modified_text, strlen($modified_text) - 60)
 

@@ -1,0 +1,62 @@
+/*
+ *  The OK and ERR function works Kinda Like Rust.
+ *
+ *  Depends on where you use it, it will encapsulate a result on top of the return result,
+ *  and it parse the data or error if it has been converted to a result
+ */
+
+fn Ok($object){
+
+    // pattern matching
+    while 1 {
+        if get_prop($object, "OK") == 0 && get_prop($object, "ERR") == 0 {
+            $result = new()
+            $result.OK  = 1
+            $result.ERR = 0
+            $result.data = $object
+            $result.err  = new()
+
+            ret ($result)
+        } /*else*/ if get_prop($object, "OK") == 1 {
+            ret ($result.data)
+        } /*else*/ if get_prop($object, "OK") == 0 {
+            ret (0)
+        } 
+    }
+}
+
+fn Err($object){
+    
+    // pattern matching
+    while 1 {
+        if get_prop($object, "OK") == 0 && get_prop($object, "ERR") == 0 {
+            $result = new()
+            $result.OK  = 0
+            $result.ERR = 1
+            $result.data = new()
+            $result.err  = $object
+
+            ret ($result)
+        } /*else*/ if get_prop($object, "ERR") == 1 {
+            ret ($result.data)
+        } /*else*/ if get_prop($object, "ERR") == 0 {
+            ret (0)
+        } 
+    }
+}
+
+/*
+ *  This is a special function for returning more complex case:
+ *  Returning result with list of warning messages
+ *
+ */
+fn Ret_results($data, $error){
+
+    $result = new()
+    $result.OK  = 0
+    $result.ERR = 1
+    $result.data = $data
+    $result.err  = $error
+
+    ret ($result)
+}

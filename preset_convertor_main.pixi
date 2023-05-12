@@ -23,6 +23,7 @@
 include "lib/utils/show_log.pixi"
 include "lib/utils/vector.pixi"
 include "lib/utils/string_utils.pixi"
+include "lib/utils/result_utils.pixi"
 
 include "lib/lkups/app_msgs.pixi"
 
@@ -34,17 +35,25 @@ include "lib/gui/components/gui_window_frame.pixi"
 include "lib/gui/components/text_message.pixi"
 include "lib/gui/popup.pixi"
 include "lib/gui/preset_converter_options.pixi"
-include "lib/gui/preset_converter_paging_logic.pixi"
+include "lib/gui/preset_converter_pager.pixi"
+
+include "lib/modules_extraction/module_extractor.pixi"
 
 include "lib/validations/preset_converter_options_validator.pixi"
+
+include "lib/models/app_setting.pixi"
 
 
 
 // 1. Start of the program, loading config if necessary, and
-//    Loading any global instance here, this is where SunVox instances and Lookup tables should be located
+// Loading any global instance here, this is where SunVox instances and Lookup tables should be located
+// Other than that, they should all be local variables
+
+// App messages
 APP_MSGS = app_msgs_lkup_new()
 
-
+// SunVox instances
+sv_mod_extr = sv_new()
 
 main() halt 
 
@@ -53,11 +62,11 @@ fn main(){
 
 	// 2. Function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
 	$options_gui = construct_preset_converter_options_gui()
-	$page_index = 0
+	$app_setting = new()
 
 	// Main event loop
 	while 1 {
-		display_settings_and_validation($options_gui)
+		$app_setting = display_settings_and_validation($options_gui)
 
 		// 3&4. Function calls for file extractions and validations
 		// Function calls...
@@ -70,6 +79,15 @@ fn main(){
 
 		break; // Temporary, well be removed once other part of the code have completed
 	}
+
+	// $file_name = get_file_name_from_input_path($options_gui.gui_comp_lkup.input_path_text_box.children[0].str_full)
+	// $file_name = get_file_type_from_input_path($options_gui.gui_comp_lkup.input_path_text_box.children[0].str_full)
+	// logf("file name is: %s", $file_name)
+
+	// extr_from_sunvox_project($app_setting.input_path)
+	// extr_from_sunvox_project("C:/Users/user/Desktop 2/Simple SunVox Import Test.sunvox")
+	
+	extr_from_sunvox_project(app_setting_debug_new())
 
 	show_log()	// This is only for debug purpose
 }

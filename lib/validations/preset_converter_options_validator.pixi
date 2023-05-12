@@ -1,20 +1,22 @@
 fn process_preset_converter_options_validator( $options_gui ){
 
-    $error_vec = vec_new(INT8)
+    $error_vec = vec_new(INT32)
     $gui_comp = $options_gui.gui_comp_lkup;
 
     // input field validation, temporary, will be replace with proper checking
-    if strlen($gui_comp.input_path_text_box.children[0].str_full) == 0 {
+    if string_is_blank($gui_comp.input_path_text_box.children[0].str_full) {
+    // if strlen($gui_comp.input_path_text_box.children[0].str_full) == 0 {
         $error_vec.push($error_vec, APP_MSGS.ERR_MISSING_INPUT)
     }
 
-    if strlen($gui_comp.file_name_text_box.children[0].str_full)  == 0 {
-        $error_vec.push($error_vec, APP_MSGS.ERR_MISSING_FILE_NAME)
+    if string_is_blank($gui_comp.file_name_text_box.children[0].str_full) {
+        $error_vec.push($error_vec, APP_MSGS.ERR_MISSING_FILE_NAME) 
     }
 
-    if strlen($gui_comp.output_path_text_box.children[0].str_full)  == 0 {
+    // This is not available yet, need to find out if it is possible to validate file path
+    /*if string_is_blank($gui_comp.output_path_text_box.children[0].str_full)  == 0 {
         $error_vec.push($error_vec, APP_MSGS.ERR_MISSING_OUTPUT)
-    }  
+    }  */
 
     // checkbox validation
     $checked_export_as = $gui_comp.export_as_cards_cb.has_checked + $gui_comp.export_as_banks_cb.has_checked
@@ -29,3 +31,4 @@ fn process_preset_converter_options_validator( $options_gui ){
 
     ret($error_vec)
 }
+

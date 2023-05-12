@@ -1,7 +1,7 @@
 fn display_settings_and_validation($options_gui){
 
     $has_validated = 0              // 0 = not yet validated; 1 = has been validated
-    $error         = vec_new(INT8)
+    $error         = vec_new(INT32)
 
     $popup   = new()
 
@@ -41,6 +41,8 @@ fn display_settings_and_validation($options_gui){
 
         frame()
     }
+
+    ret(app_setting_new($options_gui))
 }
 
 fn create_popup_based_on_error($error){
@@ -49,7 +51,7 @@ fn create_popup_based_on_error($error){
         ret($error_popup)
 
     } else {
-        $warning_message = vec_new(INT8);
+        $warning_message = vec_new(INT32);
         $warning_message.push ($warning_message, APP_MSGS.WARNING_PRECEED)
         $warning_popup = construct_preset_popup($warning_message, POPUP_WARNING)
         ret($warning_popup)

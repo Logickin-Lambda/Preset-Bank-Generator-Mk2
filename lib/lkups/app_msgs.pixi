@@ -15,6 +15,8 @@ fn app_msgs_lkup_new(){
     $APP_MSGS_LKUP.OTMZ_LV_AGGRESSIVE   = "These options are used for further reduce the size of the modules\n\n\n\nIf you choose 'Aggressive', the program will attempt to reduce the module size, \n\nby assuming the number of effective controllers of the imported modules,\n\nand remove the controllers if there is no change from the factory presets.\n\nThis might introduce unwanted behavior. \n\n\n\nUSE IT WISELY."
     $APP_MSGS_LKUP.EXPORT_BTN           = "Click here to export your presets, \n\nand it will takes you to a popup of confrimation.\n\nOnce the export action has been confrimed,\n\nthe program will perform a series of validation for your inputs;\n\nif the validation passed, the process continues; otherwise,\n\nan error popup will be shown, and you will be redirected to this page."
     
+    $APP_MSGS_LKUP.OUT_PATH_NOT_SUPPORT = "This is not supported for the current verson.\n\n\n\nWill be available if file path validation is possible,\n\n\n\nwith only using native pixi code."
+
     // pop up message
     $APP_MSGS_LKUP.ERR_MISSING_INPUT    = "Missing Input Path"
     $APP_MSGS_LKUP.ERR_MISSING_FILE_NAME= "Missing File Name"
@@ -23,6 +25,12 @@ fn app_msgs_lkup_new(){
     $APP_MSGS_LKUP.ERR_MISSING_CB_OTMZ  = "At least one Optimization mode must be chosen"
 
     $APP_MSGS_LKUP.WARNING_PRECEED      = "Are you sure to start the convertion?"
+
+    // Extraction Message
+    $APP_MSGS_LKUP.ERR_INVALID_TYPE     = "Only .sunvox is allowed"
+    $APP_MSGS_LKUP.ERR_UNSUPPORT_TYPE   = ".zip and folder are not supported currently"
+    $APP_MSGS_LKUP.ERR_FAIL_TO_LOAD     = "Fail To load the following sunvox project:"
+    $APP_MSGS_LKUP.ERR_INVALID_MODULE   = "Skipped the following invalid modules:" 
 
     ret ($APP_MSGS_LKUP)
 }

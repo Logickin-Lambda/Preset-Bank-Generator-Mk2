@@ -1,0 +1,218 @@
+EXTR_TYPE_ERROR     = -1 
+EXTR_TYPE_SUNVOX    = 0
+EXTR_TYPE_ZIP       = 1
+EXTR_TYPE_FOLDER    = 2
+
+fn /*vec<Container> OR vec<Err>*/ extract_modules_into_sunvox ($sv_mod_extr, $app_setting) {
+
+    $error_vec = vec_new(INT32);
+
+    // get the file name if possible
+    $input_path = $app_setting.input_path
+    $extr_type = determine_extraction_type ($input_path)
+
+    if $extr_type == -1 {
+        $error_vec.push($error_vec, APP_MSGS.ERR_INVALID_TYPE)
+        ret(Err($error_vec))
+    }
+
+    while 1 {
+        // switch case:
+        // if file is a sunvox file, process get_from_sunvox() to extract the modules
+        if $extr_type == EXTR_TYPE_SUNVOX {
+            $extr_result = extr_from_sunvox_project($input_path)
+            ret($extr_result)
+
+
+        } /*else*/ if $extr_type == EXTR_TYPE_ZIP {
+
+            // if the file is a zip, process get_from_zip
+            // currently not supported, throws an error first
+            $error_vec.push($error_vec, APP_MSGS.ERR_UNSUPPORT_TYPE)
+            ret(Err($error_vec))             
+        }else {
+
+            // if no file specified, try to get content from the folder
+            // currently not supported, throws an error first
+            $error_vec.push($error_vec, APP_MSGS.ERR_UNSUPPORT_TYPE)
+            ret(Err($error_vec))            
+        }
+    }
+}
+
+fn /*String*/ get_file_name_from_input_path($input_path){
+    $file_name = string_new()
+
+    if string_index_of_last($input_path, '/') == -1 {
+        ret (-1)
+    } else {
+        strcat($file_name, 0, $input_path, string_index_of_last($input_path, '/') + 1)
+        ret($file_name)
+    }
+}
+
+fn /*String*/ get_file_type_from_input_path($input_path){
+    $file_type = string_new()
+
+    if string_index_of_last($input_path, '.') == -1 {
+        ret (-1)
+    } else {
+        strcat($file_type, 0, $input_path, string_index_of_last($input_path, '.'))
+        ret($file_type)
+    }
+}
+
+fn /*int*/ determine_extraction_type ($input_path){
+    $file_name = get_file_name_from_input_path($input_path) 
+
+    if $file_name == -1 {
+        ret(EXTR_TYPE_ERROR)
+    }
+
+    if string_is_blank($file_name) {
+        ret(EXTR_TYPE_FOLDER)
+    }
+
+    $file_type = get_file_type_from_input_path($input_path)
+
+    if $file_type == -1 {
+        ret(EXTR_TYPE_ERROR)
+    }
+
+    if strcmp($file_type, ".zip") == 0{
+        ret(EXTR_TYPE_ZIP)
+    }
+
+    if strcmp($file_type, ".sunvox") == 0{
+        ret(EXTR_TYPE_SUNVOX)
+    }
+
+    ret (EXTR_TYPE_ERROR)
+}
+
+fn /*Result<Ok(module_vec), Err(error_vec)>*/ extr_from_sunvox_project($app_setting){
+
+    // Initize all variable 
+    $error_vec  = vec_new(INT32);
+    $module_vec = vec_new(INT32);
+    $input_path = $app_setting.input_path
+
+    // Load the project
+    $result = sv_load(sv_mod_extr, $input_path)
+    $num_of_slots = sv_get_number_of_modules(sv_mod_extr)
+    
+    // logf("sunvox project path: %s\n", $input_path)
+    // logf("Module slot count: %d\n", $num_of_slots)
+
+    if $num_of_slots <= 0 {
+        $error_vec.push($error_vec, APP_MSGS.ERR_FAIL_TO_LOAD)
+        $error_vec.push($error_vec, get_file_name_from_input_path($input_path))
+        ret(Err($error_vec))
+    }
+
+    if $num_of_slots == 1 {
+        ret(Ok($module_vec))
+    }
+
+    // Get the information of the first module as an init module, for runtime validation
+    $init_type      = sv_get_module_type(sv_mod_extr, 1)
+    $init_ctrl_cnt  = sv_get_number_of_module_ctls( sv_mod_extr, 1 )
+
+    for ($i = 1; $i < $num_of_slots; $i + 1){
+        
+        $module_name = sv_get_module_name( sv_mod_extr, $i )
+
+        // Skip the modules that has the different type or controller count, unless in aggressive optimization
+        if !is_valid_module_for_conversion($init_type, $init_ctrl_cnt, $i, $app_setting) {
+            $error_vec.push($error_vec, $module_name)
+            continue        
+        }
+
+        $ctrl_cnt = sv_get_number_of_module_ctls( sv_mod_extr, $i )
+
+        if $ctrl_cnt == 0 {
+            continue
+        }
+
+        $module_ctrl_vec      = extr_module_ctrl_group ($init_type, $i)
+    }
+
+    // summarizing the results:
+    $module_ctrl_vec.desc = extr_module_ctrl_name  ($init_type, $i)
+
+    if $error_vec.size != 0 {
+        $error_vec.insert_at($error_vec, 0, APP_MSGS.ERR_INVALID_MODULE)
+    }
+
+    ret(Ret_results($module_ctrl_vec, $error_vec))
+}
+
+fn /*int bool*/ is_valid_module_for_conversion ($init_type, $init_ctrl_cnt, $module_id, $app_setting){
+
+    if $app_setting.optimization == SETTING_OTMZ_AGGRESSIVE {
+        ret(1)
+    }
+
+    $module_type      = sv_get_module_type(sv_mod_extr, $module_id)
+    $module_ctrl_cnt  = sv_get_number_of_module_ctls(sv_mod_extr, $module_id)  
+
+    // logf("%d init_type: %s\n"  , $module_id, $init_type)
+    // logf("%d module_type: %s\n", $module_id, $module_type)
+    // logf("Comparison: %d\n\n", strcmp( $init_type, $module_type ))
+
+    if strcmp( $init_type, $module_type ) == 0 && $init_ctrl_cnt == $module_ctrl_cnt {
+        ret(1)
+    } else {
+        ret(0)
+    }
+}
+
+fn /*vec<ctrl_val>*/ extr_module_ctrl_group ($init_type, $module_id){
+
+    $ctrl_group_vec = vec_new(INT32)
+
+    $ctrl_cnt    = sv_get_number_of_module_ctls(sv_mod_extr, $module_id)
+    $loop_start  = 0
+
+    if strcmp($init_type, "MetaModule") == 0{
+        $loop_start + 5
+    } else {
+        $loop_start = 0
+    }
+
+    for ($i = $loop_start; $i < $ctrl_cnt; $i + 1) { 
+        // get the real value from 
+        // $ctrl_name = sv_get_module_ctl_name(sv_mod_extr, $module_id, $i)
+        $ctrl_val  = sv_get_module_ctl_value(sv_mod_extr, $module_id, $i, 1)
+        $ctrl_group_vec.push($ctrl_group_vec, $ctrl_val)
+
+        // logf("%d ctrl_name: %s ", $module_id, $ctrl_name)
+        // logf("Value: %d\n",$ctrl_val)     
+    }
+
+    ret($ctrl_group_vec)
+}
+
+fn /*vec<ctrl_val>*/ extr_module_ctrl_name ($init_type, $module_id){
+
+    $ctrl_desc_vec = vec_new(INT32)
+
+    $ctrl_cnt    = sv_get_number_of_module_ctls(sv_mod_extr, $module_id)
+    $loop_start  = 0
+
+    if strcmp($init_type, "MetaModule") == 0{
+        $loop_start + 5
+    } else {
+        $loop_start = 0
+    }
+
+    for ($i = $loop_start; $i < $ctrl_cnt; $i + 1) { 
+        // get the real value from 
+        $ctrl_name = sv_get_module_ctl_name(sv_mod_extr, $module_id, $i)
+        $ctrl_desc_vec.push($ctrl_desc_vec, $ctrl_name)
+
+        logf("%d ctrl_name: %s \n", $module_id, $ctrl_name)
+    }
+
+    ret($ctrl_desc_vec)
+}

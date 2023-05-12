@@ -1,0 +1,41 @@
+SETTING_EXPORT_CARDS    = 1
+SETTING_EXPORT_BANK     = 2
+SETTING_EXPORT_BOTH     = 3
+
+SETTING_OTMZ_NONE       = 1
+SETTING_OTMZ_NORMAL     = 2
+SETTING_OTMZ_AGGRESSIVE = 4
+
+fn app_setting_new($options_gui){
+    $app_setting = new()
+    clean($app_setting)
+
+    $gui_comp = $options_gui.gui_comp_lkup;
+
+    // file path and project name
+    $app_setting.input_path         = $gui_comp.input_path_text_box.children[0].str_full
+    $app_setting.export_entity_name = $gui_comp.file_name_text_box.children[0].str_full
+    //$app_setting.output_path        = $gui_comp.output_path_text_box.children[0].str_full
+    
+    // Check Box State
+    $app_setting.export_as          = $gui_comp.export_as_cards_cb.has_checked * 1 + $gui_comp.export_as_banks_cb.has_checked * 2
+    $app_setting.optimization       = $gui_comp.otmz_none_cb.has_checked * 1 + $gui_comp.otmz_normal_cb.has_checked * 2 + $gui_comp.otmz_aggressive_cb.has_checked * 4
+
+    ret($app_setting)
+}
+
+fn app_setting_debug_new(){
+    $app_setting = new()
+    clean($app_setting)
+
+    // file path and project name
+    $app_setting.input_path         = "C:/Users/user/Desktop 2/simple SunVox Import Test.sunvox"
+    $app_setting.export_entity_name = "TEST"
+    //$app_setting.output_path        = $gui_comp.output_path_text_box.children[0].str_full
+    
+    // Check Box State
+    $app_setting.export_as          = SETTING_EXPORT_BOTH
+    $app_setting.optimization       = SETTING_OTMZ_NORMAL
+
+    ret($app_setting)
+}

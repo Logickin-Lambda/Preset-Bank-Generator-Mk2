@@ -1,9 +1,14 @@
-ASCII_HORIZONTAL_TAB    = 9
-ASCII_NEW_LINE          = 10
-ASCII_VERTICAL_TAB      = 11
-ASCII_FROM_FEED         = 12
-ASCII_CARRIAGE_RETURN   = 13
-ASCII_SPACE             = 32
+ASCII_HORIZONTAL_TAB    = '\t'
+ASCII_NEW_LINE          = '\n'
+ASCII_VERTICAL_TAB      = '\v'
+ASCII_FROM_FEED         = '\f'
+ASCII_CARRIAGE_RETURN   = '\r'
+ASCII_SPACE             = ' '
+
+fn string_new(){
+    $temp_str = ""
+	$temp_str[0] = 0
+}
 
 fn string_is_blank($string){
     ret(!string_is_not_blank($string))
@@ -21,8 +26,8 @@ fn string_is_not_blank($string){
 }
 
 fn check_white_space_of_a_string($string){
-    for ($i = 0; $i < strlen($string); i + 1){
-        $character = $string [i]
+    for ($i = 0; $i < strlen($string); $i + 1){
+        $character = $string [$i]
 
         if  $character == ASCII_HORIZONTAL_TAB ||
             $character == ASCII_NEW_LINE ||
@@ -37,4 +42,26 @@ fn check_white_space_of_a_string($string){
         }
     }
     ret (0) 
+}
+
+fn string_index_of($string, $target){
+     for ($i = 0; $i < strlen($string); $i + 1){
+        $character = $string [$i]
+
+        if  $character == $target {
+            ret ($i)
+        }
+    }
+    ret (-1)    
+}
+
+fn string_index_of_last($string, $target){
+     for ($i = strlen($string) - 1; $i >= 0; $i - 1){
+        $character = $string [$i]
+
+        if  $character == $target {
+            ret ($i)
+        }
+    }
+    ret (-1)    
 }

@@ -18,22 +18,25 @@ fn construct_preset_converter_options_gui () {
                     -1 //texture
                     )
 
+	$temporary_size_reduction = -100
+
 	$options_gui.gui_ptr = 0
     
-    $options_gui.children[$options_gui.gui_ptr] = gui_window_frame_new($options_gui, 0, 0, 800, 600, "Preset Generator", COLOR_DEFAULT)
+    $options_gui.children[$options_gui.gui_ptr] = gui_window_frame_new($options_gui, 0, 0, 800, 600 + $temporary_size_reduction, "Preset Generator", COLOR_DEFAULT)
 	$options_gui.gui_comp_lkup.app_border = $options_gui.children[$options_gui.gui_ptr]
 	$options_gui.gui_ptr + 1
 
     // Build the main complex components 
 	build_input_path_input($options_gui)
 	build_output_folder_name($options_gui)
-	// build_output_path_input($options_gui)
+	// build_output_path_input($options_gui) 		// I won't unlock this feature until there is an intuitive and safe way to get the folder path using file dialog
 	build_export_as_check_box($options_gui)
-	build_optimization_radio_button($options_gui)
-	build_message_box($options_gui)
+//	build_optimization_radio_button($options_gui)	// This turns out useless because the optimization I can actually do is remove unused moudules in patch cards,
+	build_message_box($options_gui)					// but they might cause problem once user want to use them for saving patches
 
     // Export button
-    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, 275, 240, "Export", COLOR_INFO)
+	$y_offset = -50
+    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, 275, 240 + $y_offset, "Export", COLOR_INFO)
 	$options_gui.gui_comp_lkup.export_btn = $options_gui.children[$options_gui.gui_ptr]
 	$options_gui.gui_ptr + 1
 
@@ -47,11 +50,13 @@ fn construct_preset_converter_options_gui () {
 fn build_input_path_input($options_gui){
 
     // Input Path:
-    $options_gui.children[$options_gui.gui_ptr] = text_message_new($options_gui, -290, -230, "Input Path:", COLOR_DEFAULT)
+	$y_offset = 50 
+
+    $options_gui.children[$options_gui.gui_ptr] = text_message_new($options_gui, -290, -230 + $y_offset, "Input Path:", COLOR_DEFAULT)
 	$options_gui.gui_comp_lkup.input_path_label = $options_gui.children[$options_gui.gui_ptr].str[0].text
 	$options_gui.gui_ptr + 1
 
-    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, -280, -245, "", COLOR_SECONDARY)
+    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, -280, -245 + $y_offset, "", COLOR_SECONDARY)
     $options_gui.children[$options_gui.gui_ptr].w = 550
     $options_gui.children[$options_gui.gui_ptr].children[0].w = 544
     $options_gui.children[$options_gui.gui_ptr].children[0].str[ 0 ].x - 40
@@ -59,19 +64,21 @@ fn build_input_path_input($options_gui){
 	$options_gui.gui_comp_lkup.input_path_text_box = $options_gui.children[$options_gui.gui_ptr]
 	$options_gui.gui_ptr + 1
 
-    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, 275, -245, "Load", COLOR_INFO)
+    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, 275, -245 + $y_offset, "Load", COLOR_INFO)
 	$options_gui.gui_comp_lkup.input_path_load_btn = $options_gui.children[$options_gui.gui_ptr]
 	$options_gui.gui_ptr + 1
 }
 
 fn build_output_folder_name($options_gui){
     // File Name:
-    $options_gui.children[$options_gui.gui_ptr] = text_message_new($options_gui, -290, -180, "File Name:", COLOR_DEFAULT)
+	$y_offset = 50
+
+    $options_gui.children[$options_gui.gui_ptr] = text_message_new($options_gui, -290, -180 + $y_offset, "Export Name:", COLOR_DEFAULT)
 	$options_gui.gui_comp_lkup.file_name_label = $options_gui.children[$options_gui.gui_ptr].str[0].text
 	$options_gui.gui_ptr + 1
 
 
-    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, -280, -195, "", COLOR_SECONDARY)
+    $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, -280, -195 + $y_offset, "", COLOR_SECONDARY)
     $options_gui.children[$options_gui.gui_ptr].w = 550
     $options_gui.children[$options_gui.gui_ptr].children[0].w = 544
     $options_gui.children[$options_gui.gui_ptr].children[0].str[ 0 ].x - 40
@@ -92,6 +99,10 @@ fn build_output_path_input($options_gui){
     $options_gui.children[$options_gui.gui_ptr].children[0].str[ 0 ].x - 40
     $options_gui.children[$options_gui.gui_ptr].children[0].str[ 0 ].flags = 0b00000100
 	$options_gui.gui_comp_lkup.output_path_text_box = $options_gui.children[$options_gui.gui_ptr]
+	
+	$options_gui.gui_comp_lkup.output_path_text_box.children[0].str[0].text = trim_long_string (CURRENT_PATH)
+	$options_gui.gui_comp_lkup.output_path_text_box.children[0].str_full = CURRENT_PATH
+
 	$options_gui.gui_ptr + 1
 
     $options_gui.children[$options_gui.gui_ptr] = button_new($options_gui, 275, -145, "Load", COLOR_INFO)
@@ -101,15 +112,17 @@ fn build_output_path_input($options_gui){
 
 fn build_export_as_check_box($options_gui){
     // Export Options:
-    $options_gui.children[$options_gui.gui_ptr]  = text_message_new($options_gui, -290, -80, "Export AS:", COLOR_DEFAULT)
+	$y_offset =  0 //-50	
+
+    $options_gui.children[$options_gui.gui_ptr]  = text_message_new($options_gui, -290, -80 + $y_offset, "Export AS:", COLOR_DEFAULT)
 	$options_gui.gui_comp_lkup.export_as_label = $options_gui.children[$options_gui.gui_ptr].str[0].text
 	$options_gui.gui_ptr + 1
 
-    $options_gui.children[$options_gui.gui_ptr] = check_box_new($options_gui, -280, -90, "Patch Cards", CHECKBOX_ON, COLOR_DEFAULT)
+    $options_gui.children[$options_gui.gui_ptr] = check_box_new($options_gui, -280, -90 + $y_offset, "Patch Cards", CHECKBOX_OFF, COLOR_DEFAULT)
 	$options_gui.gui_comp_lkup.export_as_cards_cb = $options_gui.children[$options_gui.gui_ptr]
 	$options_gui.gui_ptr + 1
 
-    $options_gui.children[$options_gui.gui_ptr] = check_box_new($options_gui, -120, -90, "Compressed Patch Banks", CHECKBOX_ON, COLOR_DEFAULT)
+    $options_gui.children[$options_gui.gui_ptr] = check_box_new($options_gui, -120, -90 + $y_offset, "Compressed Patch Banks", CHECKBOX_OFF, COLOR_DEFAULT)
 	$options_gui.gui_comp_lkup.export_as_banks_cb = $options_gui.children[$options_gui.gui_ptr]	
 	$options_gui.gui_ptr + 1
 }
@@ -137,7 +150,9 @@ fn build_optimization_radio_button($options_gui){
 
 fn build_message_box($options_gui){
     // Message Box, window frame with 
-    $options_gui.children[$options_gui.gui_ptr] = gui_window_frame_new($options_gui, 0, 125, 720, 200, "Messages", COLOR_DEFAULT)
+	$y_offset = -50
+
+    $options_gui.children[$options_gui.gui_ptr] = gui_window_frame_new($options_gui, 0, 125 + $y_offset, 720, 200, "Messages", COLOR_DEFAULT)
 	$options_gui.gui_comp_lkup.msg_box = $options_gui.children[$options_gui.gui_ptr]
 
 	GUI_add_text($options_gui.children[$options_gui.gui_ptr].children[0])
@@ -175,24 +190,34 @@ fn handle_options_events($options_gui){
 
         // trigger text editor for the test editing buttons
 		if $gui_comp.input_path_text_box.has_clicked == 1 {
-			click_and_edit_text ($gui_comp.input_path_text_box, $gui_comp.input_path_label)
+			$ip_empty_str 	 = ""
+			$ip_empty_str[0] = 0
+			click_and_edit_text ($gui_comp.input_path_text_box, $gui_comp.input_path_label, $ip_empty_str)
 		}
 
 		if $gui_comp.file_name_text_box.has_clicked == 1 {
-			click_and_edit_text ($gui_comp.file_name_text_box, $gui_comp.file_name_label)
+			$en_empty_str 	 = ""
+			$en_empty_str[0] = 0	
+			click_and_edit_text ($gui_comp.file_name_text_box, $gui_comp.file_name_label, $en_empty_str)
 		}
 
 		if $gui_comp.output_path_text_box.has_clicked == 1 {
-			click_and_edit_text ($gui_comp.output_path_text_box, $gui_comp.output_path_label)
+			$op_empty_str 	 = ""
+			$op_empty_str[0] = 0	
+			click_and_edit_text ($gui_comp.output_path_text_box, $gui_comp.output_path_label, $op_empty_str)
 		}
         
 		// trigger file dialog on button press
 		if $gui_comp.input_path_load_btn.has_clicked == 1 {
-			click_and_pick_file ($gui_comp.input_path_load_btn, $gui_comp.input_path_text_box, $gui_comp.file_name_label)
+			$ip_empty_str 	 = ""
+			$ip_empty_str[0] = 0
+			click_and_pick_file ($gui_comp.input_path_load_btn, $gui_comp.input_path_text_box, $gui_comp.file_name_label, $ip_empty_str)
 		}
 
 		if $gui_comp.output_path_load_btn.has_clicked == 1 {
-			click_and_pick_file ($gui_comp.output_path_load_btn, $gui_comp.output_path_text_box, $gui_comp.output_path_label)
+			$op_empty_str 	 = ""
+			$op_empty_str[0] = 0	
+			click_and_pick_file ($gui_comp.output_path_load_btn, $gui_comp.output_path_text_box, $gui_comp.output_path_label, $op_empty_str)
 		}
 
 		// radio button actions
@@ -317,18 +342,21 @@ fn effective_direct_region_check ($current_x, $current_y, $x_start, $x_end, $y_s
 // edit text from text input
 // 
 // Input: 
-//   - $text_box_button: button object, 
-//	 - $label          : label object
+//   - $text_box_button			: button object, 
+//	 - $label          			: label object
+//   - $unique_empty_string		: empty string must be declared the first where the string has used;
+//								  otherwise, every string will be pointed as the same instance if
+//								  an empty string is declared in the function
 // Behavior: 
 //   - call the native text editing dialog
 //   - generate the trimmed version of file path for display
 //   - store the actual data in str_full instead of str, at the same child level 
 //
 // ********************************************************************************************* 
-fn click_and_edit_text ($text_box_button, $label){
+fn click_and_edit_text ($text_box_button, $label, $unique_empty_string){
 
     $modified_text = textinput_dialog ($text_box_button.children[0].str_full, $label)
-	$text_box_button.children[0].str[0].text = trim_long_string ($modified_text)
+	$text_box_button.children[0].str[0].text = trim_long_string ($modified_text, $unique_empty_string)
 	$text_box_button.children[0].str_full = $modified_text
 
 	click_event_has_sent($text_box_button)
@@ -338,19 +366,22 @@ fn click_and_edit_text ($text_box_button, $label){
 // Load path from file dialog
 // 
 // Input: 
-//	 - $load_button	   : button object, 
-//   - $text_box_button: button object, 
-//	 - $label          : label object
+//	 - $load_button	   			: button object, 
+//   - $text_box_button			: button object, 
+//	 - $label          			: label object
+//   - $unique_empty_string		: empty string must be declared the first where the string has used;
+//								  otherwise, every string will be pointed as the same instance if
+//								  an empty string is declared in the function
 // Behavior: 
 //   - call the native file dialog
 //   - generate the trimmed version of file path for display
 //   - store the actual data in str_full instead of str, at the same child level 
 //
 // ********************************************************************************************* 
-fn click_and_pick_file ($load_button, $text_box_button, $label) {
+fn click_and_pick_file ($load_button, $text_box_button, $label, $unique_empty_string) {
 
 	$file_path = file_dialog($label, "", $label, "")
-	$text_box_button.children[0].str[0].text = trim_long_string ($file_path)
+	$text_box_button.children[0].str[0].text = trim_long_string ($file_path, $unique_empty_string)
 	$text_box_button.children[0].str_full = $file_path
 
 	click_event_has_sent($load_button)
@@ -360,19 +391,21 @@ fn click_and_pick_file ($load_button, $text_box_button, $label) {
 // Trim strings that is way too long for display
 // 
 // Input: 
-//   - $modified_text: String Container, 
+//   - $modified_text			: String Container, 
+//   - $unique_empty_string		: empty string must be declared the first where the string has used;
+//								  otherwise, every string will be pointed at the same instance if
+//								  an empty string is declared in the function
 // Behavior: 
 //   - if the string contains more than 60 characters, only the last 60 characters will be kept,
 //     and the head of string will be replaced by "..."
 // ********************************************************************************************* 
-fn trim_long_string ($modified_text){
+fn trim_long_string ($modified_text, $unique_empty_string){
 
 	if strlen($modified_text) >= 60 {
-		$temp_str = string_new()
-		strcat($temp_str, "...")
-		strcat($temp_str, 0, $modified_text, strlen($modified_text) - 60)
+		strcat($unique_empty_string, "...")
+		strcat($unique_empty_string, 0, $modified_text, strlen($modified_text) - 60)
 
-		ret($temp_str)
+		ret($unique_empty_string)
 	} else {
 		ret($modified_text)
 	}

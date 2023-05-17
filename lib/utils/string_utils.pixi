@@ -5,10 +5,16 @@ ASCII_FROM_FEED         = '\f'
 ASCII_CARRIAGE_RETURN   = '\r'
 ASCII_SPACE             = ' '
 
-fn string_new(){
+
+/*
+ * For some reason, string cannnot be created uniquely using a function;
+ * otherwise, it will keep on using the same instance.
+ * This is commeneted so that I can remember string in pixilang must be declared in this way
+*/
+/*fn string_new(){
     $temp_str = ""
 	$temp_str[0] = 0
-}
+}*/
 
 fn string_is_blank($string){
     ret(!string_is_not_blank($string))

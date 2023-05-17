@@ -1,0 +1,13 @@
+fn generate_patch_banks ($app_setting, $module_vec){
+    
+    // Calculate the total module count, to find the optimal preset count for each bank
+    // it must be either 6, or multiple of 12
+    
+    // Process modules by partition
+
+    // create patterns for the 
+}
+
+fn distribute_modules_for_banks (){
+
+}

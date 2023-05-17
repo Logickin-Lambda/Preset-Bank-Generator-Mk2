@@ -2,13 +2,13 @@ fn app_msgs_lkup_new(){
     $APP_MSGS_LKUP = new()
 
     // descriptions
-    $APP_MSGS_LKUP.INFO                 = "Preset Banks generator 2.0.0 by Acheney and Logickin.\n\n\n\nWe attempted to provide an preset ECO system, \n\nto maximize the advantage of both preset standard,\n\nand make it cross-platform so tha everyone can use this program,\n\nas long as pixilang is available.\n\n\n\nPut your cursor onto any components to see the purpose of them."
+    $APP_MSGS_LKUP.INFO                 = "Preset Banks generator 2.0.0 by Logickin and acheney.\n\n\n\nAttempted to provide an preset ECO system, \n\nto maximize the advantage of current preset standards,\n\nand make it cross-platform so that everyone can use this program,\n\nas long as pixilang is available.\n\n\n\nPut your cursor onto any components to see the purpose of them."
     $APP_MSGS_LKUP.IN_PATH_TXT_BOX      = "Click Here to edit the input path."
     $APP_MSGS_LKUP.IN_PATH_LOAD_BTN     = "Click Here to get the input file path using file dialog."
     $APP_MSGS_LKUP.FILE_NAME_TXT_BOX    = "Click Here to edit the exported Preset folder and bank name."
     $APP_MSGS_LKUP.OUT_PATH_TXT_BOX     = "Click Here to edit the Output path."
     $APP_MSGS_LKUP.OUT_PATH_LOAD_BTN    = "Click Here to get the output file path using file dialog."
-    $APP_MSGS_LKUP.EXPORT_PATCH_CARDS   = "Once checked, the program will export Achceny's patch card system.\n\n\n\nInspired by the accipiter preset module, Acheney expended the functionality,\n\nby adding presents export into their modules,\n\nso that user can export their presets into the Acheney preset on the fly."
+    $APP_MSGS_LKUP.EXPORT_PATCH_CARDS   = "Once checked, the program will export Achceny's patch card system.\n\n\n\nInspired by the Accipiter preset module, Acheney expended the functionality,\n\nby adding presents export into their modules,\n\nso that user can export their presets into the Acheney preset on the fly.\n\n\n\nWARNING: Non-MetaModules are NOT FULLY SUPPORTED.\n\nYou must use a wrapper or a converter module to use."
     $APP_MSGS_LKUP.EXPORT_PATCH_BANKS   = "Once checked, the program will export Logickin's patch bank.\n\n\n\nTaking the compression into extreme,\n\nLogickin made a former program for fitting all the preset data into a pattern,\n\nresult in a highly compact, BUT immutable preset bank module.\n\nIdeal for user who just want to quickly switching the sound by keypresses,\n\nwithin the same module."
     $APP_MSGS_LKUP.OTMZ_LV_NONE         = "These options are used for further reduce the size of the modules\n\n\n\nIf you choose 'None', the program will make no optimization,\n\nand your present module will be maintained as the intended size."
     $APP_MSGS_LKUP.OTMZ_LV_NORMAL       = "These options are used for further reduce the size of the modules\n\n\n\nIf you choose 'Normal', the program will attempt to reduce the module size, \n\nby removing the modules that are not used,\n\ncomparing from the controller number or metadata of the patch cards"

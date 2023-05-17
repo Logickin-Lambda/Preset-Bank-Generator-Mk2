@@ -3,13 +3,16 @@ EXTR_TYPE_SUNVOX    = 0
 EXTR_TYPE_ZIP       = 1
 EXTR_TYPE_FOLDER    = 2
 
-fn /*vec<Container> OR vec<Err>*/ extract_modules_into_sunvox ($sv_mod_extr, $app_setting) {
+fn /*vec<Container> OR vec<Err>*/ extract_modules_into_sunvox ($app_setting) {
 
     $error_vec = vec_new(INT32);
 
     // get the file name if possible
     $input_path = $app_setting.input_path
     $extr_type = determine_extraction_type ($input_path)
+
+    //logf("sunvox project path: %s\n", $input_path)
+    //logf("extr Type: %d\n", $extr_type)
 
     if $extr_type == -1 {
         $error_vec.push($error_vec, APP_MSGS.ERR_INVALID_TYPE)
@@ -20,10 +23,10 @@ fn /*vec<Container> OR vec<Err>*/ extract_modules_into_sunvox ($sv_mod_extr, $ap
         // switch case:
         // if file is a sunvox file, process get_from_sunvox() to extract the modules
         if $extr_type == EXTR_TYPE_SUNVOX {
-            $extr_result = extr_from_sunvox_project($input_path)
+
+            $extr_result = extr_from_sunvox_project($app_setting)
+
             ret($extr_result)
-
-
         } /*else*/ if $extr_type == EXTR_TYPE_ZIP {
 
             // if the file is a zip, process get_from_zip
@@ -41,7 +44,10 @@ fn /*vec<Container> OR vec<Err>*/ extract_modules_into_sunvox ($sv_mod_extr, $ap
 }
 
 fn /*String*/ get_file_name_from_input_path($input_path){
-    $file_name = string_new()
+    $file_name = ""
+    $file_name[0] = 0
+
+    //logf("New String: %s\n", $file_name)
 
     if string_index_of_last($input_path, '/') == -1 {
         ret (-1)
@@ -52,7 +58,10 @@ fn /*String*/ get_file_name_from_input_path($input_path){
 }
 
 fn /*String*/ get_file_type_from_input_path($input_path){
-    $file_type = string_new()
+    $file_type = ""
+    $file_type[0] = 0
+
+    //logf("New String: %s\n", $file_type)
 
     if string_index_of_last($input_path, '.') == -1 {
         ret (-1)
@@ -64,6 +73,7 @@ fn /*String*/ get_file_type_from_input_path($input_path){
 
 fn /*int*/ determine_extraction_type ($input_path){
     $file_name = get_file_name_from_input_path($input_path) 
+    //logf("file name: %s\n", $file_name)
 
     if $file_name == -1 {
         ret(EXTR_TYPE_ERROR)
@@ -74,6 +84,7 @@ fn /*int*/ determine_extraction_type ($input_path){
     }
 
     $file_type = get_file_type_from_input_path($input_path)
+    //logf("file type: %s\n", $file_type)
 
     if $file_type == -1 {
         ret(EXTR_TYPE_ERROR)
@@ -100,7 +111,7 @@ fn /*Result<Ok(module_vec), Err(error_vec)>*/ extr_from_sunvox_project($app_sett
     // Load the project
     $result = sv_load(sv_mod_extr, $input_path)
     $num_of_slots = sv_get_number_of_modules(sv_mod_extr)
-    
+
     // logf("sunvox project path: %s\n", $input_path)
     // logf("Module slot count: %d\n", $num_of_slots)
 
@@ -134,17 +145,20 @@ fn /*Result<Ok(module_vec), Err(error_vec)>*/ extr_from_sunvox_project($app_sett
             continue
         }
 
-        $module_ctrl_vec      = extr_module_ctrl_group ($init_type, $i)
+        $module = new()
+        $module.ctrls = extr_module_ctrl_group ($init_type, $i)
+        $module.name  = $module_name
+        $module_vec.push($module_vec, $module )
     }
 
     // summarizing the results:
-    $module_ctrl_vec.desc = extr_module_ctrl_name  ($init_type, $i)
+    $module_vec.desc = extr_module_ctrl_name  ($init_type, $init_ctrl_cnt)
 
     if $error_vec.size != 0 {
         $error_vec.insert_at($error_vec, 0, APP_MSGS.ERR_INVALID_MODULE)
     }
 
-    ret(Ret_results($module_ctrl_vec, $error_vec))
+    ret(Ret_results($module_vec, $error_vec))
 }
 
 fn /*int bool*/ is_valid_module_for_conversion ($init_type, $init_ctrl_cnt, $module_id, $app_setting){
@@ -159,8 +173,9 @@ fn /*int bool*/ is_valid_module_for_conversion ($init_type, $init_ctrl_cnt, $mod
     // logf("%d init_type: %s\n"  , $module_id, $init_type)
     // logf("%d module_type: %s\n", $module_id, $module_type)
     // logf("Comparison: %d\n\n", strcmp( $init_type, $module_type ))
-
-    if strcmp( $init_type, $module_type ) == 0 && $init_ctrl_cnt == $module_ctrl_cnt {
+    
+    // It is considered as a pass if there is no module in the slot or the type of the module is same as the first one
+    if strcmp( $init_type, $module_type ) == 0 && $init_ctrl_cnt == $module_ctrl_cnt || $module_ctrl_cnt == 0 {
         ret(1)
     } else {
         ret(0)
@@ -193,11 +208,9 @@ fn /*vec<ctrl_val>*/ extr_module_ctrl_group ($init_type, $module_id){
     ret($ctrl_group_vec)
 }
 
-fn /*vec<ctrl_val>*/ extr_module_ctrl_name ($init_type, $module_id){
+fn /*vec<ctrl_val>*/ extr_module_ctrl_name ($init_type, $init_ctrl_cnt){
 
     $ctrl_desc_vec = vec_new(INT32)
-
-    $ctrl_cnt    = sv_get_number_of_module_ctls(sv_mod_extr, $module_id)
     $loop_start  = 0
 
     if strcmp($init_type, "MetaModule") == 0{
@@ -206,12 +219,12 @@ fn /*vec<ctrl_val>*/ extr_module_ctrl_name ($init_type, $module_id){
         $loop_start = 0
     }
 
-    for ($i = $loop_start; $i < $ctrl_cnt; $i + 1) { 
+    for ($i = $loop_start; $i < $init_ctrl_cnt; $i + 1) { 
         // get the real value from 
-        $ctrl_name = sv_get_module_ctl_name(sv_mod_extr, $module_id, $i)
+        $ctrl_name = sv_get_module_ctl_name(sv_mod_extr, 1, $i)
         $ctrl_desc_vec.push($ctrl_desc_vec, $ctrl_name)
 
-        logf("%d ctrl_name: %s \n", $module_id, $ctrl_name)
+        //logf("ctrl_name: %s \n",$ctrl_name)
     }
 
     ret($ctrl_desc_vec)

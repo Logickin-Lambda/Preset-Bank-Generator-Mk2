@@ -1,0 +1,72 @@
+fn /*string*/ get_patch_card_template_location (){
+    $patch_card_template_location = ""
+    $patch_card_template_location[0] = 0
+
+    sprintf($patch_card_template_location, "%s/%s", CURRENT_PATH, "template/Acheney Patch Card.sunsynth")
+
+    ret ($patch_card_template_location)
+}
+
+fn /*void*/ generate_patch_cards($app_setting, $module_vec){
+    
+    // control flow:
+    // the loop index will be started at 6
+    // but getting content from the module_vec by -6 offset (first content started at 0);
+    // for non-metamodules, a wrapper or a converter module must be used due to the current limitation of SunVox
+    // This will be further discussed once Acheney has returned to the SunVox community, 
+    // attempting to finding the better UX on these modules
+
+    $patch_card_template_location = get_patch_card_template_location()
+
+    // logf("$app_setting.export_as: %d\n", $app_setting.export_as)
+    if $app_setting.export_as == SETTING_EXPORT_CARDS || $app_setting.export_as == SETTING_EXPORT_BOTH {
+
+        // logf("$module_vec.size: %d\n", $module_vec.size)
+        for ($i = 0; $i < $module_vec.size; $i + 1){
+            $cur_module      = $module_vec[$i]
+            $cur_module_name = $module_vec[$i].name
+
+            // logf("%d %s\n", $i, $cur_module_name)
+
+            convert_individual_modules($patch_card_template_location, $i, $cur_module, $cur_module_name)
+        }
+    }
+
+    $patch_name = ""
+    $patch_name[0] = 0
+    sprintf($patch_name, "%s/%s %s", $app_setting.output_path, $app_setting.export_entity_name, "Patch Cards.sunvox")
+
+    sv_save( sv_mod_card, $patch_name );
+}
+
+fn /*void*/ convert_individual_modules($patch_card_template_location, $idx, $cur_module, $cur_module_name){
+    
+    $x = 432 + (floor($idx / 16) * -80)
+    $y = 512 + (floor($idx % 16) * 96)
+
+    $module_id = sv_load_module(sv_mod_card, $patch_card_template_location, $x, $y)
+
+    //logf("$module_id: %d %s\n", $module_id, $cur_module_name)
+    
+    // Construct module name for patch cards
+    $patch_name = ""
+    $patch_name[0] = 0
+    sprintf($patch_name, "%d %s", $idx, $cur_module_name)
+
+    // limit module name to 32 characters, technically a sub string function
+    // without limiting the string length, the name simply won't be written on the module
+    $patch_name[32] = 0
+    sv_set_module_name( sv_mod_card, $module_id, $patch_name )
+
+    for ($i = 0; $i < $cur_module.ctrls.size; $i + 1){
+
+        sv_set_module_ctl_value( sv_mod_card, $module_id, $i + 5, $cur_module.ctrls[$i], 1 )
+        $current_ctrl_value = 0
+
+        // have to use a spin lock here; otherwise, sv_set_module_ctl_value don't have enough time to 
+        // set all the ctrls before saving the sunvox project
+        while ($current_ctrl_value != $cur_module.ctrls[$i]) {
+            $current_ctrl_value = sv_get_module_ctl_value(sv_mod_card, $module_id, $i + 5, 1 )
+        } 
+    }
+}

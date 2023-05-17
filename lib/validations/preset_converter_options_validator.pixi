@@ -24,10 +24,11 @@ fn process_preset_converter_options_validator( $options_gui ){
         $error_vec.push($error_vec, APP_MSGS.ERR_MISSING_CB_EXPORT)
     }   
 
-    $checked_otmz = $gui_comp.otmz_none_cb.has_checked + $gui_comp.otmz_normal_cb.has_checked + $gui_comp.otmz_aggressive_cb.has_checked
+    // Removed, and something more useful will be replace if needed
+    /*$checked_otmz = $gui_comp.otmz_none_cb.has_checked + $gui_comp.otmz_normal_cb.has_checked + $gui_comp.otmz_aggressive_cb.has_checked
     if $checked_otmz == 0 {
         $error_vec.push($error_vec, APP_MSGS.ERR_MISSING_CB_OTMZ)
-    }   
+    }  */ 
 
     ret($error_vec)
 }

@@ -1,0 +1,49 @@
+fn /*void*/ create_directories_by_setting($app_setting){
+
+    // Construct all related directories
+    rename_previously_export_as_backup($app_setting, $app_setting.output_path)
+    create_directories_group($app_setting, $app_setting.output_path)
+}
+
+fn /*void*/ rename_previously_export_as_backup($app_setting, $path) {
+
+    // Build timestamp for folder backup
+    $timestamp = ""
+    $timestamp[0] = 0
+
+    sprintf($timestamp, "backup_%04d%02d%02d_%02d%02d%02d", get_year(), get_month(), get_day(), get_hours(), get_minutes(), get_seconds())
+    logf("timestamp: %s\n", $timestamp)
+
+    $backup_path     = ""
+    $backup_path[0]  = 0
+
+    sprintf($backup_path, "%s %s", $path, $timestamp)
+
+    logf("rename old directory: %s\n", $backup_path)
+
+    // Just confirmed rename_file() can be doubled as a rename directory function
+    $result = rename_file($path, $backup_path)
+    logf("rename old directory %d\n", $result)
+}
+
+/*
+ * Save module function is not available in SunVox lib, so I can't save patch cards as separated file
+ * Will be unlocked once saving sunsynth is possible
+ */
+fn /*void*/ create_directories_group($app_setting, $path){
+
+    $root_dir_result = create_directory($path)
+    // logf("rename old directory %d\n", $root_dir_result)
+
+    // create folder for patch cards 
+    /*if $app_setting.export_as == SETTING_EXPORT_CARDS || 
+       $app_setting.export_as == SETTING_EXPORT_BOTH {
+
+        $patch_cards_path    = ""
+        $patch_cards_path[0] = 0
+
+        sprintf($patch_cards_path, "%s/patch cards", $path)
+
+        $root_dir_result = create_directory($patch_cards_path)
+    }*/
+}

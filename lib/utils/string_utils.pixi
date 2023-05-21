@@ -10,7 +10,10 @@ ASCII_SPACE             = ' '
  * For some reason, string cannnot be created uniquely using a function;
  * otherwise, it will keep on using the same instance.
  * This is commeneted so that I can remember string in pixilang must be declared in this way
-*/
+ *
+ * IMPORTANT: Don't try to refactor by grouping all the functions with string declaration, or it will break the program completely
+ *            I know it becuase I have tried that before, and it introduces bugs when it use anything related to strings
+ */
 /*fn string_new(){
     $temp_str = ""
 	$temp_str[0] = 0

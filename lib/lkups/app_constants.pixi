@@ -1,0 +1,47 @@
+// Since constants can be used in everywhere once they have been declared in any page
+// I decided to locate all the non-utils constant here for better referencing
+
+// General Constant
+TYPE_METAMODULE     = "MetaModule"
+TYPE_MULTISYNTH     = "MultiSynth"
+TYPE_VEL2CTL        = "Velocity2Ctl"
+OUTPUT_MODULE_ID    = 0     // Output module ID must be in 0 for any sunvox project
+
+
+
+// Module Conversion General Constant
+X_POS_OFFSET        = -80
+Y_POS_OFFSET        = 96
+LOW_WORD_MASK       = 0xFFFF
+WORD_SIZE_SHIFT     = 16
+ROWS_PER_COL        = 16
+META_CTRL_OFFSET    = 5
+REAL_VALUE_SCALE    = 0
+PATTERN_COL_SCALE   = 1
+DISPLAY_SCALE       = 2
+VEL2CTL_TARGET_CTRL = 4     // Set target controller in the velocity2ctl, the fifth controller
+
+// Module Conversion for Cards
+
+// Module Conversion for Banks
+MIN_BANK_CNT        = 1
+MIN_BANK_MARGIN     = 6
+MIN_PATCH_CNT       = 6
+
+MAX_BANK_SIZE       = 120
+EFF_BANK_MARGIN     = 12
+
+MAX_TRACK_SIZE      = 32
+PATTERN_Y_OFFSET    = 32
+NO_CLONE_FROM_PREV  = -1
+
+INPUT_MULTISYNTH_ID = 1
+PATCH_SELECTOR_ID   = 15
+CORE_METAMODULE_ID  = 10
+
+MULTISYNTH_PHASE    = 6
+
+META_CTRL_INPUT     = 1
+META_CTRL_PLAY_MODE = 2
+META_CTRL_BPM       = 3
+META_CTRL_TPL       = 4

@@ -153,6 +153,7 @@ fn /*Result<Ok(module_vec), Err(error_vec)>*/ extr_from_sunvox_project($app_sett
 
     // summarizing the results:
     $module_vec.desc = extr_module_ctrl_name  ($init_type, $init_ctrl_cnt)
+    $module_vec.type = $init_type
 
     if $error_vec.size != 0 {
         $error_vec.insert_at($error_vec, 0, APP_MSGS.ERR_INVALID_MODULE)
@@ -189,7 +190,7 @@ fn /*vec<ctrl_val>*/ extr_module_ctrl_group ($init_type, $module_id){
     $ctrl_cnt    = sv_get_number_of_module_ctls(sv_mod_extr, $module_id)
     $loop_start  = 0
 
-    if strcmp($init_type, "MetaModule") == 0{
+    if strcmp($init_type, TYPE_METAMODULE) == 0{
         $loop_start + 5
     } else {
         $loop_start = 0
@@ -213,7 +214,7 @@ fn /*vec<ctrl_val>*/ extr_module_ctrl_name ($init_type, $init_ctrl_cnt){
     $ctrl_desc_vec = vec_new(INT32)
     $loop_start  = 0
 
-    if strcmp($init_type, "MetaModule") == 0{
+    if strcmp($init_type, TYPE_METAMODULE) == 0{
         $loop_start + 5
     } else {
         $loop_start = 0

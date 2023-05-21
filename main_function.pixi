@@ -1,0 +1,73 @@
+
+fn /*void*/ main(){
+	// main program, containing:
+
+	// 2. Function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
+	$options_gui = construct_preset_converter_options_gui()
+	$app_setting = new()
+
+	// Main event loop
+	while 1 {
+		$app_setting = display_settings_and_validation($options_gui)
+
+		// 3&4. Function calls for file extractions and validations
+		$extr_result = extract_modules_into_sunvox($app_setting)
+		//debug_module_extractor($extr_result)
+
+		// 5&6: Function calls for generating and exporting presets
+		if Ok($extr_result) {
+			create_directories_by_setting($app_setting)
+			generate_patch_cards($app_setting, Ok_parse($extr_result))
+			generate_patch_banks($app_setting, Ok_parse($extr_result))
+		}
+
+		// 7. function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
+		// Function calls...
+
+		break; // Temporary, well be removed once other part of the code have completed
+	}
+
+	// Debug function locates here
+	// create_directories_by_setting(app_setting_debug_new())
+
+	show_log()	// This is only for debug purpose
+}
+
+/*
+ * Since there is no good way to do unit test using pixilang,
+ * this function is to provide a visual feedback for tracing issue during module extraction
+ */
+fn /*void*/ debug_module_extractor($extr_result){
+	
+	if Ok($extr_result) {
+		logf(" Export is Ok\n")
+		$modules = Ok_parse($extr_result)
+
+		logf("found %d modules\n"  , $modules.size)
+
+		for ($i = 0; $i < $modules.size; $i + 1){
+
+			logf("\nmodule name: %s\n",  $modules[$i].name)
+			$ctrl_group = $modules[$i].ctrls
+			
+			for ($j = 0; $j < $ctrl_group.size; $j + 1){
+
+				logf("%d controller_name: %s "  , $j , $modules.desc[$j])
+    			logf("module_type: %d\n",  $ctrl_group[$j])
+
+			}
+		}
+	}
+
+	if Err($extr_result) {
+		logf(" Export With Error\n")
+		$err_msgs = Err_parse($extr_result)
+
+		logf("found %d errors\n"  , $err_msgs.size)
+
+		for ($i = 0; $i < $err_msgs.size; $i + 1){
+			$msg = $err_msgs[$i]
+			logf("%d Msg: %s \n"  , $i , $msg)
+		}
+	}
+}

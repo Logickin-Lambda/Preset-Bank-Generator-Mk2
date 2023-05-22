@@ -27,15 +27,30 @@ fn /*void*/ rename_previously_export_as_backup($app_setting, $path) {
 }
 
 /*
- * Save module function is not available in SunVox lib, so I can't save patch cards as separated file
- * Will be unlocked once saving sunsynth is possible
+ * Create all the reqired folders for the preset conversion
+ * 
+ * Input: 
+ *   - $app_setting: the setting users created from the GUI
+ *   - $path       : the path where the preset banks are exported
+ * 
  */
 fn /*void*/ create_directories_group($app_setting, $path){
 
+    // create process temp folder if there isn't any
+    $process_temp_path    = ""
+    $process_temp_path[0] = 0
+    sprintf($process_temp_path, "%s/process temp", CURRENT_PATH)
+
+    $process_temp = create_directory($process_temp_path)
+
+    // create export folder
     $root_dir_result = create_directory($path)
     // logf("rename old directory %d\n", $root_dir_result)
 
     // create folder for patch cards 
+    // Save module function is not available in SunVox lib, so I can't save patch cards as separated file
+    // Will be unlocked once saving sunsynth is possible
+
     /*if $app_setting.export_as == SETTING_EXPORT_CARDS || 
        $app_setting.export_as == SETTING_EXPORT_BOTH {
 

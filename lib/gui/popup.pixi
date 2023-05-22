@@ -2,6 +2,8 @@ POPUP_INFO      = 0
 POPUP_WARNING   = 1
 POPUP_ERROR     = 2
 POPUP_SUCCESS   = 3
+POPUP_PROCESSING= 4
+POPUP_WARN_NCB  = 5     // stands for WARNing No Cancel Button
 
 // *********************************************************************************************
 // Construct the popups 
@@ -21,28 +23,40 @@ fn construct_preset_popup ($messages, $type){
     // define the color and the size of the popup
     $color  = COLOR_LIGHT
     $header = "Info" 
-    $confrim_button_name = "OK"
+    $confirm_button_name = "OK"
 
     while 1 {
         if $type == POPUP_WARNING {
             $color = COLOR_WARNING
             $header = "Warning"
-            $confrim_button_name = "Confirm"
+            $confirm_button_name = "Confirm"
+            break
+
+        } /*else*/ if $type == POPUP_WARN_NCB {
+            $color = COLOR_WARNING
+            $header = "Warning"
+            $confirm_button_name = "OK"   
             break
 
         } /*else*/ if $type == POPUP_ERROR {
             $color = COLOR_DANGER
             $header = "Error"
-            $confrim_button_name = "Back"
+            $confirm_button_name = "Back"
             break
 
         } /*else*/ if $type == POPUP_SUCCESS {
             $color = COLOR_SUCCESS
             $header = "Success"
-            $confrim_button_name = "OK"
+            $confirm_button_name = "OK"
             break
 
-        } else {
+        } /*else*/ if $type == POPUP_PROCESSING{
+            $color = COLOR_SECONDARY
+            $header = "Processing"
+            $confirm_button_name = ""  
+            break      
+               
+        }else {
             break
         }
         
@@ -82,28 +96,34 @@ fn construct_preset_popup ($messages, $type){
     
     while 1 {
         if $type == POPUP_WARNING {
-            $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confrim_button_name, $color)
+            $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confirm_button_name, $color)
             $popup.gui_comp_lkup.button_confirm = $popup.children[2]
-
+            
             $popup.children[3] = button_new($popup, 0, 10 + ($row_size * 8), "Cancel", COLOR_SECONDARY)
             $popup.gui_comp_lkup.button_cancel = $popup.children[3]
             break
 
+        } /*else*/ if $type == POPUP_WARN_NCB{
+            $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confirm_button_name, $color)
+            $popup.gui_comp_lkup.button_confirm = $popup.children[2]
+
+            break
         } /*else*/ if $type == POPUP_ERROR {
-            $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confrim_button_name, $color)
+            $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confirm_button_name, $color)
             $popup.gui_comp_lkup.button_cancel = $popup.children[2]
 
             $popup.gui_comp_lkup.button_confirm.has_clicked = 0
             break
 
-        } else{
-            $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confrim_button_name, $color)
+        } /*else*/ if $type != POPUP_PROCESSING{
+            $popup.children[2] = button_new($popup, 110, 10 + ($row_size * 8), $confirm_button_name, $color)
             $popup.gui_comp_lkup.button_confirm = $popup.children[2]
 
             $popup.gui_comp_lkup.button_cancel.has_clicked = 0
             break
 
         }
+        break
     }
 
 

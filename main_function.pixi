@@ -9,6 +9,7 @@ fn /*void*/ main(){
 	// Main event loop
 	while 1 {
 		$app_setting = display_settings_and_validation($options_gui)
+		create_processing_message()
 
 		// 3&4. Function calls for file extractions and validations
 		$extr_result = extract_modules_into_sunvox($app_setting)
@@ -19,18 +20,17 @@ fn /*void*/ main(){
 			create_directories_by_setting($app_setting)
 			generate_patch_cards($app_setting, Ok_parse($extr_result))
 			generate_patch_banks($app_setting, Ok_parse($extr_result))
+
+			create_complete_message(Err_parse($extr_result))
 		}
-
-		// 7. function calls for front end of the program, drawing the ui or some demoscenes (if necessary)
-		// Function calls...
-
-		break; // Temporary, well be removed once other part of the code have completed
+		
+		break; // Original idea was to make the program re-runnable, I need to understand how memory works in pixilang before I can do this to prevent menory leak
 	}
 
 	// Debug function locates here
 	// create_directories_by_setting(app_setting_debug_new())
 
-	show_log()	// This is only for debug purpose
+	//show_log()	// This is only for debug purpose
 }
 
 /*

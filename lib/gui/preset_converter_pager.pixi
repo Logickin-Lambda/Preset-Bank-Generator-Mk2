@@ -1,21 +1,21 @@
 fn display_settings_and_validation($options_gui){
 
     $has_validated = 0              // 0 = not yet validated; 1 = has been validated
-    $error         = vec_new(INT32)
+    $error_vec     = vec_new(INT32)
 
     $popup   = new()
 
     while 1 {
         clear()
-        
+
         if $options_gui.gui_comp.export_btn.has_clicked == 0 {
 			$options_gui.draw( $options_gui )
 			handle_options_events($options_gui)
 		}
         
         if $options_gui.gui_comp.export_btn.has_clicked == 1 && $has_validated == 0 {
-            $error = process_preset_converter_options_validator( $options_gui )
-            $popup = create_popup_based_on_error($error)
+            $error_vec = process_preset_converter_options_validator( $options_gui )
+            $popup = create_popup_based_on_error($error_vec)
 
             $has_validated = 1
         }
@@ -45,9 +45,9 @@ fn display_settings_and_validation($options_gui){
     ret(app_setting_new($options_gui))
 }
 
-fn create_popup_based_on_error($error){
-    if $error.size > 0 {
-        $error_popup = construct_preset_popup($error, POPUP_ERROR)
+fn create_popup_based_on_error($error_vec){
+    if $error_vec.size > 0 {
+        $error_popup = construct_preset_popup($error_vec, POPUP_ERROR)
         ret($error_popup)
 
     } else {
@@ -56,4 +56,47 @@ fn create_popup_based_on_error($error){
         $warning_popup = construct_preset_popup($warning_message, POPUP_WARNING)
         ret($warning_popup)
     }   
+}
+
+fn create_processing_message(){
+    clear()
+    $popup_msg = vec_new(INT32)
+    $popup_msg.push($popup_msg, "Preset Conversion in progress, please wait...")
+    $popup_msg.push($popup_msg, "Patch Cards might takes a couple of minutes,")
+    $popup_msg.push($popup_msg, "as setting controllers in SunVox takes time.")
+
+    $processing_popup = construct_preset_popup($popup_msg, POPUP_PROCESSING)
+    $processing_popup.draw( $processing_popup )
+    handle_popup_events($processing_popup)
+
+    frame()
+}
+
+fn create_complete_message($msg_vec){
+
+    $result_popup = new(INT32)
+
+    if $msg_vec.size == 0{
+        $msg_vec.push($msg_vec, "Presets have been converted successfully.")
+        $msg_vec.push($msg_vec, "Please find the presets in the export folder.")
+        $result_popup = construct_preset_popup($msg_vec, POPUP_SUCCESS)
+
+    } else {
+        $msg_vec.insert_at($msg_vec, 0, "Presets have been converted with error:")
+        $msg_vec.push($msg_vec, "")
+        $msg_vec.push($msg_vec, "Please find the presets in the export folder.")
+        $result_popup = construct_preset_popup($msg_vec, POPUP_WARN_NCB)
+    }
+
+    while 1 {
+        clear()
+        $result_popup.draw( $result_popup)
+        handle_popup_events($result_popup)
+
+        if result_popup.gui_comp_lkup.button_confirm.has_clicked {
+            break
+        }
+        frame()
+    }
+
 }

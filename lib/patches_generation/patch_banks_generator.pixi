@@ -232,6 +232,7 @@ fn generate_modules_for_core_logic($bank_size, $module_vec){
         // set all the ctrls before saving the sunvox project
         while ($current_ctrl_value != $target_controller) {
             $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_core, $module_id, VEL2CTL_TARGET_CTRL, REAL_VALUE_SCALE )
+            sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
         } 
     }
 
@@ -293,6 +294,13 @@ fn save_command_into_core_logic_as_temp($bank_size, $bank_idx, $module_vec){
     sv_save( sv_mod_bank_core, $patch_bank_temp_name );
 }
 
+/*
+ * write one of the preset configuration into one of the line of a pattern
+ *
+ * Input:
+ *   - $module      : Controller data of one of the module from module_vec
+ *   - $current_line: the current index of the selected module
+ */
 fn write_patch_data_for_single_preset($module, $current_line){
 
     // Write all the patch data into patterns 
@@ -338,7 +346,15 @@ fn generate_surface_logic_for_individual_banks($app_setting, $bank_size, $bank_i
     sv_save( sv_mod_bank_surf, $patch_bank_temp_name );
 }
 
-fn create_multisynth_for_preset_selection($bank_size, $bank_idx, $module_vec){
+/*
+ * Create a bunch of multisynth with different phase offset for select the preset
+ *
+ * Input:
+ *   - $bank_size  : objects of three integer counters: bank_cnt, bank_margin, patch_cnt
+ *   - $bank_idx   : if it ended up splitting multiple banks, each bank has a unique index for fetching content from the module vector
+ *   - $module_vec : The controllers data extracted from the sunsynths in module_extractor.pixi
+ */
+fn /*void*/ create_multisynth_for_preset_selection($bank_size, $bank_idx, $module_vec){
     // get the location of the input multisynth module, which is 1 in the surface logic template
     $module_coordinates = sv_get_module_xy(sv_mod_bank_surf, PATCH_SELECTOR_ID)
     $x_ini = ( $module_coordinates                     & LOW_WORD_MASK ) - (X_POS_OFFSET * 2)
@@ -370,7 +386,15 @@ fn create_multisynth_for_preset_selection($bank_size, $bank_idx, $module_vec){
     }
 }
 
-fn load_core_logic_into_surface_logic($bank_idx, $module_vec){
+/*
+ * Load the core storage into the core logic metamodule inside the surface logic,
+ * and set the playback properties of the core sotrage.
+ * 
+ * Input:
+ *   - $bank_idx   : if it ended up splitting multiple banks, each bank has a unique index for fetching content from the module vector
+ *   - $module_vec : The controllers data extracted from the sunsynths in module_extractor.pixi
+ */
+fn /*void*/ load_core_logic_into_surface_logic($bank_idx, $module_vec){
 
     // fetch the correct core logic temp into surface logic
     $patch_bank_temp_name    = ""
@@ -380,6 +404,9 @@ fn load_core_logic_into_surface_logic($bank_idx, $module_vec){
     sv_metamodule_load( sv_mod_bank_surf, CORE_METAMODULE_ID, $patch_bank_temp_name );
 
     // oh no, there are lot of spinlocks here, but I have no choice for setting those controllers safely
+    // Sleep function are intended, as spinlocks can be quite CPU intensive, but since sv_set_module_ctl_value() is relatively slow
+    // adding sleep don't really slow down the process much and they can reduce CPU usage.
+
     // set the input module
     $input_module = $module_vec.desc.size + 1 // number of ctrls + output module
     sv_set_module_ctl_value( sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_INPUT, $input_module, REAL_VALUE_SCALE )
@@ -387,6 +414,7 @@ fn load_core_logic_into_surface_logic($bank_idx, $module_vec){
     $current_ctrl_value = 0
     while ($current_ctrl_value != $input_module) {
         $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_INPUT, REAL_VALUE_SCALE )
+        sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
     } 
 
     // set the play mode as 1 "on repeat"
@@ -395,6 +423,7 @@ fn load_core_logic_into_surface_logic($bank_idx, $module_vec){
     $current_ctrl_value = 0
     while ($current_ctrl_value != 1) {
         $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_PLAY_MODE, REAL_VALUE_SCALE )
+        sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
     } 
 
     // set the BPM to 1000
@@ -403,6 +432,7 @@ fn load_core_logic_into_surface_logic($bank_idx, $module_vec){
     $current_ctrl_value = 0
     while ($current_ctrl_value != 1000) {
         $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_BPM, REAL_VALUE_SCALE )
+        sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
     } 
 
     // set the TPL to one
@@ -411,6 +441,7 @@ fn load_core_logic_into_surface_logic($bank_idx, $module_vec){
     $current_ctrl_value = 0
     while ($current_ctrl_value != 1) {
         $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_TPL, REAL_VALUE_SCALE )
+        sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
     }
 }
 
@@ -424,7 +455,7 @@ fn load_core_logic_into_surface_logic($bank_idx, $module_vec){
  *   - $bank_idx   : if it ended up splitting multiple banks, each bank has a unique index for fetching content from the module vector
  *   - $module_vec : The controllers data extracted from the sunsynths in module_extractor.pixi
  */
-fn export_bank( $app_setting, $bank_idx, $module_vec){
+fn /*void*/ export_bank( $app_setting, $bank_idx, $module_vec){
 
     // construct preset bank module
     $patch_bank_name    = ""

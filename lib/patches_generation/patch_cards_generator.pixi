@@ -114,7 +114,7 @@ fn /*void*/ convert_individual_modules($patch_card_template_location, $idx, $cur
         // set all the ctrls before saving the sunvox project
         while ($current_ctrl_value != $cur_module.ctrls[$i]) {
             $current_ctrl_value = sv_get_module_ctl_value(sv_mod_card, $module_id, $i + META_CTRL_OFFSET, PATTERN_COL_SCALE )
-            sleep(100) // sleep is applied, hopefully this can reduce the CPU usage
+            sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
         } 
     }
 }

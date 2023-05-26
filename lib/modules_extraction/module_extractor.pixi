@@ -115,14 +115,10 @@ fn /*Result<Ok(module_vec), Err(error_vec)>*/ extr_from_sunvox_project($app_sett
     // logf("sunvox project path: %s\n", $input_path)
     // logf("Module slot count: %d\n", $num_of_slots)
 
-    if $num_of_slots <= 0 {
+    if $num_of_slots <= 1 {
         $error_vec.push($error_vec, APP_MSGS.ERR_FAIL_TO_LOAD)
         $error_vec.push($error_vec, get_file_name_from_input_path($input_path))
         ret(Err($error_vec))
-    }
-
-    if $num_of_slots == 1 {
-        ret(Ok($module_vec))
     }
 
     // Get the information of the first module as an init module, for runtime validation
@@ -151,12 +147,27 @@ fn /*Result<Ok(module_vec), Err(error_vec)>*/ extr_from_sunvox_project($app_sett
         $module_vec.push($module_vec, $module )
     }
 
-    // summarizing the results:
-    $module_vec.desc = extr_module_ctrl_name  ($init_type, $init_ctrl_cnt)
-    $module_vec.type = $init_type
+    // summarizing the results, with common data:
+    $module_vec.desc    = extr_module_ctrl_name  ($init_type, $init_ctrl_cnt)
+    $module_vec.ctrl_id = extr_module_ctrl_id ($init_type, $init_ctrl_cnt)
+    $module_vec.type    = $init_type
 
     if $error_vec.size != 0 {
         $error_vec.insert_at($error_vec, 0, APP_MSGS.ERR_INVALID_MODULE)
+    }
+
+    // special handling for analog generator, due to its unobtainable dropdown menu controls affecting sounds
+    // SunVoxLib currently don't support fetching option dropdown, reserved this functionality for future update
+    if strcmp($init_type, TYPE_METAMODULE) != 0{
+        if $error_vec.size != 0 {
+            $error_vec.insert_at($error_vec, 0, APP_MSGS.ANALOG_GEN_N_CARDS_1)
+            $error_vec.insert_at($error_vec, 1, APP_MSGS.ANALOG_GEN_N_CARDS_2)
+            $error_vec.insert_at($error_vec, 2, APP_MSGS.ANALOG_GEN_N_CARDS_3)
+        }else{
+            $error_vec.push($error_vec, APP_MSGS.ANALOG_GEN_N_CARDS_1)
+            $error_vec.push($error_vec, APP_MSGS.ANALOG_GEN_N_CARDS_2)
+            $error_vec.push($error_vec, APP_MSGS.ANALOG_GEN_N_CARDS_3)
+        }
     }
 
     ret(Ret_results($module_vec, $error_vec))
@@ -190,8 +201,9 @@ fn /*vec<ctrl_val>*/ extr_module_ctrl_group ($init_type, $module_id){
     $ctrl_cnt    = sv_get_number_of_module_ctls(sv_mod_extr, $module_id)
     $loop_start  = 0
 
+    // getting the standard slide bar controllers
     if strcmp($init_type, TYPE_METAMODULE) == 0{
-        $loop_start + 5
+        $loop_start + META_CTRL_OFFSET
     } else {
         $loop_start = 0
     }
@@ -206,16 +218,27 @@ fn /*vec<ctrl_val>*/ extr_module_ctrl_group ($init_type, $module_id){
         // logf("Value: %d\n",$ctrl_val)     
     }
 
+    // special handling for analog generator, due to its unobtainable dropdown menu controls affecting sounds
+    // SunVoxLib currently don't support fetching option dropdown, reserved this functionality for future update
+    // if strcmp($init_type, TYPE_ANALOG_GEN) == 0 {
+    //     for($i = ANALOG_GEN_DDMENU_START; $i <= ANALOG_GEN_DDMENU_END; $i + 1){
+            
+    //         $ctrl_val  = sv_get_module_ctl_value(sv_mod_extr, $module_id, $i, 1)
+    //         $ctrl_group_vec.push($ctrl_group_vec, $ctrl_val)           
+    //     }        
+    // }
+
     ret($ctrl_group_vec)
 }
 
-fn /*vec<ctrl_val>*/ extr_module_ctrl_name ($init_type, $init_ctrl_cnt){
+fn /*vec<ctrl_desc>*/ extr_module_ctrl_name ($init_type, $init_ctrl_cnt){
 
     $ctrl_desc_vec = vec_new(INT32)
     $loop_start  = 0
 
+    // getting the standard slide bar controllers
     if strcmp($init_type, TYPE_METAMODULE) == 0{
-        $loop_start + 5
+        $loop_start + META_CTRL_OFFSET
     } else {
         $loop_start = 0
     }
@@ -228,5 +251,45 @@ fn /*vec<ctrl_val>*/ extr_module_ctrl_name ($init_type, $init_ctrl_cnt){
         //logf("ctrl_name: %s \n",$ctrl_name)
     }
 
+    // special handling for analog generator, due to its unobtainable dropdown menu controls affecting sounds
+    // SunVoxLib currently don't support fetching option dropdown, reserved this functionality for future update
+    // if strcmp($init_type, TYPE_ANALOG_GEN) == 0 {
+    //     for($i = ANALOG_GEN_DDMENU_START; $i <= ANALOG_GEN_DDMENU_END; $i + 1){
+            
+    //         $ctrl_val  = sv_get_module_ctl_name(sv_mod_extr, 1, $i)
+    //         $ctrl_desc_vec.push($ctrl_desc_vec, $ctrl_val)           
+    //     }        
+    // }
+
     ret($ctrl_desc_vec)
 }
+
+fn /*vec<ctrl_ID>*/ extr_module_ctrl_id ($init_type, $init_ctrl_cnt){
+
+    $ctrl_id_vec = vec_new(INT32)
+    $loop_start  = 0
+
+    // getting the standard slide bar controllers
+    if strcmp($init_type, TYPE_METAMODULE) == 0{
+        $loop_start + META_CTRL_OFFSET
+    } else {
+        $loop_start = 0
+    }
+
+    for ($i = $loop_start; $i < $init_ctrl_cnt; $i + 1) { 
+        // get the real value from 
+        $ctrl_id_vec.push($ctrl_id_vec, $i )
+    }
+
+    // special handling for analog generator, due to its unobtainable dropdown menu controls affecting sounds
+    // SunVoxLib currently don't support fetching option dropdown, reserved this functionality for future update
+    // if strcmp($init_type, TYPE_ANALOG_GEN) == 0 {
+    //     for($i = ANALOG_GEN_DDMENU_START; $i <= ANALOG_GEN_DDMENU_END; $i + 1){
+
+    //         $ctrl_id_vec.push($ctrl_id_vec, $i)           
+    //     }        
+    // }
+
+    ret($ctrl_id_vec)
+}
+  

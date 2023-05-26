@@ -35,7 +35,8 @@ fn display_settings_and_validation($options_gui){
 
         if $has_validated == 1 && $popup.gui_comp_lkup.button_confirm.has_clicked == 1{
             // Exit the loop, and process the conversion
-            $has_validated == 0
+            $has_validated = 0
+            $options_gui.gui_comp.export_btn.has_clicked = 0
             break;
         }
 
@@ -58,7 +59,7 @@ fn create_popup_based_on_error($error_vec){
     }   
 }
 
-fn create_processing_message(){
+fn render_processing_message(){
     clear()
     $popup_msg = vec_new(INT32)
     $popup_msg.push($popup_msg, "Preset Conversion in progress, please wait...")
@@ -72,7 +73,7 @@ fn create_processing_message(){
     frame()
 }
 
-fn create_complete_message($msg_vec){
+fn render_complete_message($msg_vec){
 
     $result_popup = new(INT32)
 
@@ -83,6 +84,7 @@ fn create_complete_message($msg_vec){
 
     } else {
         $msg_vec.insert_at($msg_vec, 0, "Presets have been converted with error:")
+        $msg_vec.insert_at($msg_vec, 1, "")
         $msg_vec.push($msg_vec, "")
         $msg_vec.push($msg_vec, "Please find the presets in the export folder.")
         $result_popup = construct_preset_popup($msg_vec, POPUP_WARN_NCB)
@@ -99,4 +101,20 @@ fn create_complete_message($msg_vec){
         frame()
     }
 
+}
+
+fn render_error_message($msg_vec){
+
+    $processing_popup = construct_preset_popup($msg_vec, POPUP_ERROR)
+
+    while 1 {
+        clear()
+        $processing_popup.draw( $processing_popup )
+        handle_popup_events($processing_popup)
+        
+        if $processing_popup.gui_comp_lkup.button_cancel.has_clicked {
+            break
+        }
+        frame()
+    }
 }

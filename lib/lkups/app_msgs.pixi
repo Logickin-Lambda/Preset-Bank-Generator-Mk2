@@ -29,8 +29,11 @@ fn app_msgs_lkup_new(){
     // Extraction Message
     $APP_MSGS_LKUP.ERR_INVALID_TYPE     = "Only .sunvox is allowed"
     $APP_MSGS_LKUP.ERR_UNSUPPORT_TYPE   = ".zip and folder are not supported currently"
-    $APP_MSGS_LKUP.ERR_FAIL_TO_LOAD     = "Fail To load the following sunvox project:"
+    $APP_MSGS_LKUP.ERR_FAIL_TO_LOAD     = "Empty sunvox project found"
     $APP_MSGS_LKUP.ERR_INVALID_MODULE   = "Skipped the following invalid modules:" 
+    $APP_MSGS_LKUP.ANALOG_GEN_N_CARDS_1 = "Modules other than MetaModules might not be fully" 
+    $APP_MSGS_LKUP.ANALOG_GEN_N_CARDS_2 = "supported, especially modules with a dropdown" 
+    $APP_MSGS_LKUP.ANALOG_GEN_N_CARDS_3 = "option that affect sounds like analog generators." 
 
     ret ($APP_MSGS_LKUP)
 }

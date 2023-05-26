@@ -205,6 +205,12 @@ fn generate_modules_for_core_logic($bank_size, $module_vec){
     $x_ini = ( $module_coordinates                     & LOW_WORD_MASK ) + X_POS_OFFSET
     $y_ini = (($module_coordinates >> WORD_SIZE_SHIFT) & LOW_WORD_MASK )
 
+    // if the module type is metamodule, add the offset for the controller
+    $ctrl_offset = 0
+    if strcmp( $module_vec.type, TYPE_METAMODULE ) == 0{
+        $ctrl_offset = META_CTRL_OFFSET
+    }
+
     // construct all vel2ctls based on the input, expected at least one preset, 
     // or it will rejected by the validation before this function call
     $ctrl_cnt = $module_vec.desc.size
@@ -224,7 +230,7 @@ fn generate_modules_for_core_logic($bank_size, $module_vec){
 
         // The magic number 1 must be used because controller index and target controller are offset by one,
         // but it is not worth to create a constant because this magic number is only used once in the whole system
-        $target_controller = $i + META_CTRL_OFFSET + 1
+        $target_controller = $module_vec.ctrl_id[$i] + 1 //$i + $ctrl_offset + 1
         sv_set_module_ctl_value( sv_mod_bank_core, $module_id, VEL2CTL_TARGET_CTRL, $target_controller, REAL_VALUE_SCALE )
         $current_ctrl_value = 0
 
@@ -232,7 +238,7 @@ fn generate_modules_for_core_logic($bank_size, $module_vec){
         // set all the ctrls before saving the sunvox project
         while ($current_ctrl_value != $target_controller) {
             $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_core, $module_id, VEL2CTL_TARGET_CTRL, REAL_VALUE_SCALE )
-            sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
+            sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
         } 
     }
 
@@ -360,7 +366,7 @@ fn /*void*/ create_multisynth_for_preset_selection($bank_size, $bank_idx, $modul
     $x_ini = ( $module_coordinates                     & LOW_WORD_MASK ) - (X_POS_OFFSET * 2)
     $y_ini = (($module_coordinates >> WORD_SIZE_SHIFT) & LOW_WORD_MASK )
 
-    for ($i = 0; $i < $module_vec.size; $i + 1){
+    for ($i = 0; $i < $bank_size.bank_margin; $i + 1){
         $x = $x_ini + (floor($i / ROWS_PER_COL) * -X_POS_OFFSET)
         $y = $y_ini + (floor($i % ROWS_PER_COL) * -Y_POS_OFFSET)
 
@@ -382,7 +388,19 @@ fn /*void*/ create_multisynth_for_preset_selection($bank_size, $bank_idx, $modul
         // set all the ctrls before saving the sunvox project
         while ($current_ctrl_value != $multisynth_phase) {
             $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, $module_id, MULTISYNTH_PHASE, REAL_VALUE_SCALE )
+            sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
         } 
+
+        // empty patch will not produce any sound
+        if $i >= $bank_size.patch_cnt {
+            sv_set_module_ctl_value( sv_mod_bank_surf, $module_id, MULTISYNTH_VELOCITY, 0, REAL_VALUE_SCALE )
+            $current_ctrl_value = 0
+
+            while ($current_ctrl_value != $multisynth_phase) {
+                $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, $module_id, MULTISYNTH_PHASE, MULTISYNTH_VELOCITY )
+                sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
+            } 
+        }
     }
 }
 
@@ -414,7 +432,7 @@ fn /*void*/ load_core_logic_into_surface_logic($bank_idx, $module_vec){
     $current_ctrl_value = 0
     while ($current_ctrl_value != $input_module) {
         $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_INPUT, REAL_VALUE_SCALE )
-        sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
+        sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
     } 
 
     // set the play mode as 1 "on repeat"
@@ -423,7 +441,7 @@ fn /*void*/ load_core_logic_into_surface_logic($bank_idx, $module_vec){
     $current_ctrl_value = 0
     while ($current_ctrl_value != 1) {
         $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_PLAY_MODE, REAL_VALUE_SCALE )
-        sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
+        sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
     } 
 
     // set the BPM to 1000
@@ -432,7 +450,7 @@ fn /*void*/ load_core_logic_into_surface_logic($bank_idx, $module_vec){
     $current_ctrl_value = 0
     while ($current_ctrl_value != 1000) {
         $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_BPM, REAL_VALUE_SCALE )
-        sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
+        sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
     } 
 
     // set the TPL to one
@@ -441,7 +459,7 @@ fn /*void*/ load_core_logic_into_surface_logic($bank_idx, $module_vec){
     $current_ctrl_value = 0
     while ($current_ctrl_value != 1) {
         $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_TPL, REAL_VALUE_SCALE )
-        sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
+        sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
     }
 }
 
@@ -464,7 +482,7 @@ fn /*void*/ export_bank( $app_setting, $bank_idx, $module_vec){
 
     // get the location of the input output module, which is 0 in the surface logic template
     $module_coordinates = sv_get_module_xy(sv_mod_bank_xprt, OUTPUT_MODULE_ID)
-    $x_ini = ( $module_coordinates                     & LOW_WORD_MASK ) - (X_POS_OFFSET * 2)
+    $x_ini = ( $module_coordinates                     & LOW_WORD_MASK ) + X_POS_OFFSET
     $y_ini = (($module_coordinates >> WORD_SIZE_SHIFT) & LOW_WORD_MASK )
 
     $x = $x_ini + (floor($bank_idx / ROWS_PER_COL) * X_POS_OFFSET)

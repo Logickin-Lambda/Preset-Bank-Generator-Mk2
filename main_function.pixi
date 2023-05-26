@@ -9,11 +9,11 @@ fn /*void*/ main(){
 	// Main event loop
 	while 1 {
 		$app_setting = display_settings_and_validation($options_gui)
-		create_processing_message()
+		render_processing_message()
 
 		// 3&4. Function calls for file extractions and validations
 		$extr_result = extract_modules_into_sunvox($app_setting)
-		//debug_module_extractor($extr_result)
+		debug_module_extractor($extr_result)
 
 		// 5&6: Function calls for generating and exporting presets
 		if Ok($extr_result) {
@@ -21,16 +21,19 @@ fn /*void*/ main(){
 			generate_patch_cards($app_setting, Ok_parse($extr_result))
 			generate_patch_banks($app_setting, Ok_parse($extr_result))
 
-			create_complete_message(Err_parse($extr_result))
+			render_complete_message(Err_parse($extr_result))
+			break // Original idea was to make the program re-runnable, I need to understand how memory works in pixilang before I can do this to prevent menory leak
 		}
 		
-		break; // Original idea was to make the program re-runnable, I need to understand how memory works in pixilang before I can do this to prevent menory leak
+		if !Ok($extr_result) && Err($extr_result){
+			render_error_message(Err_parse($extr_result))
+		}
 	}
 
 	// Debug function locates here
 	// create_directories_by_setting(app_setting_debug_new())
 
-	//show_log()	// This is only for debug purpose
+	show_log()	// This is only for debug purpose
 }
 
 /*
@@ -52,7 +55,7 @@ fn /*void*/ debug_module_extractor($extr_result){
 			
 			for ($j = 0; $j < $ctrl_group.size; $j + 1){
 
-				logf("%d controller_name: %s "  , $j , $modules.desc[$j])
+				logf("%d controller_name: %s "  , $modules.ctrl_id[$j] , $modules.desc[$j])
     			logf("module_type: %d\n",  $ctrl_group[$j])
 
 			}

@@ -2,46 +2,59 @@
 // I decided to locate all the non-utils constant here for better referencing
 
 // General Constant
-TYPE_METAMODULE     = "MetaModule"
-TYPE_MULTISYNTH     = "MultiSynth"
-TYPE_VEL2CTL        = "Velocity2Ctl"
-OUTPUT_MODULE_ID    = 0     // Output module ID must be in 0 for any sunvox project
+SPINLOCK_WAIT_TIME      = 25    // this used for reducing the CPU usage by putting a thread into sleep when spinlock is in operation
+DEFAULT_THREAD_CNT      = 32    // Not all computers can use all the threads, my computer only creates 12 threads; 
+                                // perhaps it is something related the core count of a CPU because my computer has 6 cores.
 
+TYPE_METAMODULE         = "MetaModule"
+TYPE_ANALOG_GEN         = "Analog generator"
+TYPE_MULTISYNTH         = "MultiSynth"
+TYPE_VEL2CTL            = "Velocity2Ctl"
+OUTPUT_MODULE_ID        = 0     // Output module ID must be in 0 for any sunvox project
+
+META_CTRL_OFFSET        = 5
+REAL_VALUE_SCALE        = 0
+PATTERN_COL_SCALE       = 1
+DISPLAY_SCALE           = 2
+
+// Module extraction 
+METAMODULE_DDMENU_START = 0x007B
+METAMODULE_DDMENU_END   = 0x007F
+
+ANALOG_GEN_DDMENU_START = 0x0072
+ANALOG_GEN_DDMENU_END   = 0x007F
 
 
 // Module Conversion General Constant
-X_POS_OFFSET        = -80
-Y_POS_OFFSET        = 96
-LOW_WORD_MASK       = 0xFFFF
-WORD_SIZE_SHIFT     = 16
-ROWS_PER_COL        = 16
-META_CTRL_OFFSET    = 5
-REAL_VALUE_SCALE    = 0
-PATTERN_COL_SCALE   = 1
-DISPLAY_SCALE       = 2
-VEL2CTL_TARGET_CTRL = 4     // Set target controller in the velocity2ctl, the fifth controller
+X_POS_OFFSET            = -80
+Y_POS_OFFSET            = 96
+LOW_WORD_MASK           = 0xFFFF
+WORD_SIZE_SHIFT         = 16
+ROWS_PER_COL            = 16
+VEL2CTL_TARGET_CTRL     = 4     // Set target controller in the velocity2ctl, the fifth controller
 
 // Module Conversion for Cards
 
 // Module Conversion for Banks
-MIN_BANK_CNT        = 1
-MIN_BANK_MARGIN     = 6
-MIN_PATCH_CNT       = 6
+MIN_BANK_CNT            = 1
+MIN_BANK_MARGIN         = 6
+MIN_PATCH_CNT           = 6
 
-MAX_BANK_SIZE       = 120
-EFF_BANK_MARGIN     = 12
+MAX_BANK_SIZE           = 120
+EFF_BANK_MARGIN         = 12
 
-MAX_TRACK_SIZE      = 32
-PATTERN_Y_OFFSET    = 32
-NO_CLONE_FROM_PREV  = -1
+MAX_TRACK_SIZE          = 32
+PATTERN_Y_OFFSET        = 32
+NO_CLONE_FROM_PREV      = -1
 
-INPUT_MULTISYNTH_ID = 1
-PATCH_SELECTOR_ID   = 15
-CORE_METAMODULE_ID  = 10
+INPUT_MULTISYNTH_ID     = 1
+PATCH_SELECTOR_ID       = 15
+CORE_METAMODULE_ID      = 10
 
-MULTISYNTH_PHASE    = 6
+MULTISYNTH_VELOCITY     = 2
+MULTISYNTH_PHASE        = 6
 
-META_CTRL_INPUT     = 1
-META_CTRL_PLAY_MODE = 2
-META_CTRL_BPM       = 3
-META_CTRL_TPL       = 4
+META_CTRL_INPUT         = 1
+META_CTRL_PLAY_MODE     = 2
+META_CTRL_BPM           = 3
+META_CTRL_TPL           = 4

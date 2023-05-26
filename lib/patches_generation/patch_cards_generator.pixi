@@ -41,10 +41,12 @@ fn /*string*/ clear_sunvox_for_patch_cards (){
     sv_load( sv_mod_card, clear_sunvox_for_patch_cards ())
 
     $patch_card_template_location = get_patch_card_template_location()
-    // logf("$app_setting.export_as: %d\n", $app_setting.export_as)
+    logf("$app_setting.export_as: %d\n", $app_setting.export_as)
+    logf("$module_vec.size: %d\n", $module_vec.size)
 
-    // logf("$module_vec.size: %d\n", $module_vec.size)
     for ($i = 0; $i < $module_vec.size; $i + 1){
+
+        // original implementation
         $cur_module      = $module_vec[$i]
         $cur_module_name = $module_vec[$i].name
 
@@ -79,7 +81,7 @@ fn /*string*/ clear_sunvox_for_patch_cards (){
  *   - void
  */
 
-fn /*void*/ convert_individual_modules($patch_card_template_location, $idx, $cur_module, $cur_module_name){
+fn /*void*/ convert_individual_modules($patch_card_template_location, $idx, $cur_module, $cur_module_name, $cur_module_type){
     
     // get the location of the output module
     $module_coordinates = sv_get_module_xy(sv_mod_card, 0)  // 0 is always the output module
@@ -105,16 +107,25 @@ fn /*void*/ convert_individual_modules($patch_card_template_location, $idx, $cur
     $patch_name[32] = 0
     sv_set_module_name( sv_mod_card, $module_id, $patch_name )
 
-    for ($i = 0; $i < $cur_module.ctrls.size; $i + 1){
+    $ini_ticks = get_ticks()
 
+    for ($i = 0; $i < $cur_module.ctrls.size; $i + 1){
         sv_set_module_ctl_value( sv_mod_card, $module_id, $i + META_CTRL_OFFSET, $cur_module.ctrls[$i], PATTERN_COL_SCALE )
+    }
+
+    for ($i = 0; $i < $cur_module.ctrls.size; $i + 1){
+        
         $current_ctrl_value = 0
 
         // have to use a spin lock here; otherwise, sv_set_module_ctl_value don't have enough time to 
         // set all the ctrls before saving the sunvox project
         while ($current_ctrl_value != $cur_module.ctrls[$i]) {
             $current_ctrl_value = sv_get_module_ctl_value(sv_mod_card, $module_id, $i + META_CTRL_OFFSET, PATTERN_COL_SCALE )
-            sleep(50) // sleep is applied, hopefully this can reduce the CPU usage
+            //sleep(10) // sleep is applied, hopefully this can reduce the CPU usage
         } 
+
     }
+
+    logf("Tcks spent for module %d: %d\n", $module_id, get_ticks() - $ini_ticks)
+    
 }

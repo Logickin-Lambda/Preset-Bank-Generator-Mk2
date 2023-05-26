@@ -213,7 +213,9 @@ fn generate_modules_for_core_logic($bank_size, $module_vec){
 
     // construct all vel2ctls based on the input, expected at least one preset, 
     // or it will rejected by the validation before this function call
-    $ctrl_cnt = $module_vec.desc.size
+    $target_controller_vec  = vec_new(INT32)
+    $module_id_vec          = vec_new(INT32)
+    $ctrl_cnt               = $module_vec.desc.size
 
     logf ("control count: %d\n", $ctrl_cnt)
     
@@ -232,15 +234,25 @@ fn generate_modules_for_core_logic($bank_size, $module_vec){
         // but it is not worth to create a constant because this magic number is only used once in the whole system
         $target_controller = $module_vec.ctrl_id[$i] + 1 //$i + $ctrl_offset + 1
         sv_set_module_ctl_value( sv_mod_bank_core, $module_id, VEL2CTL_TARGET_CTRL, $target_controller, REAL_VALUE_SCALE )
+
+        $target_controller_vec.push($target_controller_vec, $target_controller)
+        $module_id_vec.push($module_id_vec, $module_id)
+    }
+
+    for ($i = 0; $i < $ctrl_cnt; $i + 1){
+
         $current_ctrl_value = 0
 
         // have to use a spin lock here; otherwise, sv_set_module_ctl_value don't have enough time to
         // set all the ctrls before saving the sunvox project
-        while ($current_ctrl_value != $target_controller) {
-            $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_core, $module_id, VEL2CTL_TARGET_CTRL, REAL_VALUE_SCALE )
+        while ($current_ctrl_value != $target_controller_vec[$i]) {
+            $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_core, $module_id_vec[$i], VEL2CTL_TARGET_CTRL, REAL_VALUE_SCALE )
             sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
         } 
     }
+
+    remove($target_controller_vec)
+    remove($module_id_vec)
 
     // create a multisynth to trigger all velocity2ctls
     sv_lock( sv_mod_bank_core )
@@ -362,6 +374,10 @@ fn generate_surface_logic_for_individual_banks($app_setting, $bank_size, $bank_i
  */
 fn /*void*/ create_multisynth_for_preset_selection($bank_size, $bank_idx, $module_vec){
     // get the location of the input multisynth module, which is 1 in the surface logic template
+    $module_id_vec = vec_new(INT32)
+    $phase_vec     = vec_new(INT32)
+    $velocity_vec  = vec_new(INT32)
+
     $module_coordinates = sv_get_module_xy(sv_mod_bank_surf, PATCH_SELECTOR_ID)
     $x_ini = ( $module_coordinates                     & LOW_WORD_MASK ) - (X_POS_OFFSET * 2)
     $y_ini = (($module_coordinates >> WORD_SIZE_SHIFT) & LOW_WORD_MASK )
@@ -379,28 +395,37 @@ fn /*void*/ create_multisynth_for_preset_selection($bank_size, $bank_idx, $modul
         sv_unlock( sv_mod_bank_surf )
                 
         // The magic number 32768 must be used for evenly split the playhead in the core logic pattern,
-        // but it is not worth to create a constant because this magic number is only used once in the whole system
+        // but it is not worth to create a constant because this magic number is used once only in the whole system
         $multisynth_phase = ceil(32768.0 * $i / $bank_size.bank_margin)
         sv_set_module_ctl_value( sv_mod_bank_surf, $module_id, MULTISYNTH_PHASE, $multisynth_phase, REAL_VALUE_SCALE )
-        $current_ctrl_value = 0
 
-        // have to use a spin lock here; otherwise, sv_set_module_ctl_value don't have enough time to
-        // set all the ctrls before saving the sunvox project
-        while ($current_ctrl_value != $multisynth_phase) {
-            $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, $module_id, MULTISYNTH_PHASE, REAL_VALUE_SCALE )
-            sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
-        } 
+        $module_id_vec.push($module_id_vec, $module_id)
+        $phase_vec.push($phase_vec, $multisynth_phase)
 
         // empty patch will not produce any sound
         if $i >= $bank_size.patch_cnt {
             sv_set_module_ctl_value( sv_mod_bank_surf, $module_id, MULTISYNTH_VELOCITY, 0, REAL_VALUE_SCALE )
-            $current_ctrl_value = 0
-
-            while ($current_ctrl_value != $multisynth_phase) {
-                $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, $module_id, MULTISYNTH_PHASE, MULTISYNTH_VELOCITY )
-                sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
-            } 
+            $velocity_vec.push($velocity_vec, 0)
+        }else{
+            $velocity_vec.push($velocity_vec, -1)
         }
+    }
+
+    for ($i = 0; $i < $bank_size.bank_margin; $i + 1){
+
+        // have to use a spin lock here; otherwise, sv_set_module_ctl_value don't have enough time to
+        // set all the ctrls before saving the sunvox project
+        $current_ctrl_value = 0
+        while ($current_ctrl_value != $phase_vec[$i]) {
+            $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, $module_id_vec[$i], MULTISYNTH_PHASE, REAL_VALUE_SCALE )
+            sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
+        }
+        
+        $current_ctrl_value = 0
+        while ($current_ctrl_value != $velocity_vec[$i] && $velocity_vec[$i] != -1) {
+            $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, $module_id_vec[$i], MULTISYNTH_VELOCITY, REAL_VALUE_SCALE )
+            sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
+        } 
     }
 }
 
@@ -421,45 +446,44 @@ fn /*void*/ load_core_logic_into_surface_logic($bank_idx, $module_vec){
 
     sv_metamodule_load( sv_mod_bank_surf, CORE_METAMODULE_ID, $patch_bank_temp_name );
 
-    // oh no, there are lot of spinlocks here, but I have no choice for setting those controllers safely
     // Sleep function are intended, as spinlocks can be quite CPU intensive, but since sv_set_module_ctl_value() is relatively slow
     // adding sleep don't really slow down the process much and they can reduce CPU usage.
 
     // set the input module
     $input_module = $module_vec.desc.size + 1 // number of ctrls + output module
     sv_set_module_ctl_value( sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_INPUT, $input_module, REAL_VALUE_SCALE )
-
-    $current_ctrl_value = 0
-    while ($current_ctrl_value != $input_module) {
-        $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_INPUT, REAL_VALUE_SCALE )
-        sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
-    } 
-
     // set the play mode as 1 "on repeat"
     sv_set_module_ctl_value( sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_PLAY_MODE, 1, REAL_VALUE_SCALE )
-
-    $current_ctrl_value = 0
-    while ($current_ctrl_value != 1) {
-        $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_PLAY_MODE, REAL_VALUE_SCALE )
-        sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
-    } 
-
     // set the BPM to 1000
     sv_set_module_ctl_value( sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_BPM, 1000, REAL_VALUE_SCALE )
-
-    $current_ctrl_value = 0
-    while ($current_ctrl_value != 1000) {
-        $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_BPM, REAL_VALUE_SCALE )
-        sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
-    } 
-
     // set the TPL to one
     sv_set_module_ctl_value( sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_TPL, 1, REAL_VALUE_SCALE )
 
-    $current_ctrl_value = 0
-    while ($current_ctrl_value != 1) {
+    // grouping all spinlock so that to check them all at once
+    while (1) {
+        sleep(SPINLOCK_WAIT_TIME)
+        
+        $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_INPUT, REAL_VALUE_SCALE )
+        if $current_ctrl_value != $input_module {
+            continue
+        }
+
+        $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_PLAY_MODE, REAL_VALUE_SCALE )
+        if $current_ctrl_value != 1 {
+            continue
+        }
+
+        $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_BPM, REAL_VALUE_SCALE )
+        if $current_ctrl_value != 1000 {
+            continue
+        }
+
         $current_ctrl_value = sv_get_module_ctl_value(sv_mod_bank_surf, CORE_METAMODULE_ID, META_CTRL_TPL, REAL_VALUE_SCALE )
-        sleep(SPINLOCK_WAIT_TIME) // sleep is applied, hopefully this can reduce the CPU usage
+        if $current_ctrl_value != 1 {
+            continue
+        }
+
+        break
     }
 }
 

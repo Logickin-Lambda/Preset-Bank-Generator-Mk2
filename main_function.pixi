@@ -13,7 +13,7 @@ fn /*void*/ main(){
 
 		// 3&4. Function calls for file extractions and validations
 		$extr_result = extract_modules_into_sunvox($app_setting)
-		debug_module_extractor($extr_result)
+		//debug_module_extractor($extr_result)
 
 		// 5&6: Function calls for generating and exporting presets
 		if Ok($extr_result) {
@@ -33,7 +33,7 @@ fn /*void*/ main(){
 	// Debug function locates here
 	// create_directories_by_setting(app_setting_debug_new())
 
-	show_log()	// This is only for debug purpose
+	//show_log()	// This is only for debug purpose
 }
 
 /*

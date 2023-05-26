@@ -2,7 +2,8 @@
 // I decided to locate all the non-utils constant here for better referencing
 
 // General Constant
-SPINLOCK_WAIT_TIME      = 25    // this used for reducing the CPU usage by putting a thread into sleep when spinlock is in operation
+SPINLOCK_WAIT_TIME      = 1     // this used for reducing the CPU usage by putting a thread into sleep when spinlocks are in operation;
+                                // it makes no sense if this program takes 20%+ of CPU by doing nothing except for waiting some IOs
 DEFAULT_THREAD_CNT      = 32    // Not all computers can use all the threads, my computer only creates 12 threads; 
                                 // perhaps it is something related the core count of a CPU because my computer has 6 cores.
 

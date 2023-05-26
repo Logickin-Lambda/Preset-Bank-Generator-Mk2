@@ -63,8 +63,6 @@ fn render_processing_message(){
     clear()
     $popup_msg = vec_new(INT32)
     $popup_msg.push($popup_msg, "Preset Conversion in progress, please wait...")
-    $popup_msg.push($popup_msg, "Patch Cards might takes a couple of minutes,")
-    $popup_msg.push($popup_msg, "as setting controllers in SunVox takes time.")
 
     $processing_popup = construct_preset_popup($popup_msg, POPUP_PROCESSING)
     $processing_popup.draw( $processing_popup )

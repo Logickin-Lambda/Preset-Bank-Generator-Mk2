@@ -22,7 +22,7 @@ fn construct_preset_converter_options_gui () {
 
 	$options_gui.gui_ptr = 0
     
-    $options_gui.children[$options_gui.gui_ptr] = gui_window_frame_new($options_gui, 0, 0, 800, 600 + $temporary_size_reduction, "Preset Generator", COLOR_DEFAULT)
+    $options_gui.children[$options_gui.gui_ptr] = gui_window_frame_new($options_gui, 0, 0, 800, 600 + $temporary_size_reduction, "Preset Bank Generator", COLOR_DEFAULT)
 	$options_gui.gui_comp_lkup.app_border = $options_gui.children[$options_gui.gui_ptr]
 	$options_gui.gui_ptr + 1
 
@@ -380,7 +380,7 @@ fn click_and_edit_text ($text_box_button, $label, $unique_empty_string){
 // ********************************************************************************************* 
 fn click_and_pick_file ($load_button, $text_box_button, $label, $unique_empty_string) {
 
-	$file_path = file_dialog($label, "", $label, "")
+	$file_path = file_dialog($label, "sunvox", $label, "")
 	$text_box_button.children[0].str[0].text = trim_long_string ($file_path, $unique_empty_string)
 	$text_box_button.children[0].str_full = $file_path
 

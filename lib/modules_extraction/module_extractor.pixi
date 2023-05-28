@@ -144,6 +144,15 @@ fn /*int*/ determine_extraction_type ($input_path){
     ret (EXTR_TYPE_ERROR)
 }
 
+/*********************************************************************************************
+ * extract module from a given sunvox project
+ * 
+ * Input: 
+ *   - $input_path from the app_setting
+ * Output: 
+ *   - Result object which contains the vector of imported module, and the error message
+ * 
+ *********************************************************************************************/ 
 fn /*Result<Ok(module_vec), Err(error_vec)>*/ extr_from_sunvox_project($app_setting){
 
     // Initize all variable 
@@ -216,6 +225,21 @@ fn /*Result<Ok(module_vec), Err(error_vec)>*/ extr_from_sunvox_project($app_sett
     ret(Ret_results($module_vec, $error_vec))
 }
 
+/*********************************************************************************************
+ * validate the current module to see if the module has the same type and number of controllers,
+ * comparing with the first module that is acted as an init module.
+ * 
+ * Input: 
+ *   - $init_type       : the type of the first module
+ *   - $init_ctrl_cnt   : the controller count of the first module
+ *   - $module_id       : the current module id in the SunVox project
+ *   - $app_setting     : the setting provide from the user in the option menu
+ * Output: 
+ *   - integer represented boolean
+ *      - 0: valid module
+ *      - 1: invalid module
+ * 
+ *********************************************************************************************/ 
 fn /*int bool*/ is_valid_module_for_conversion ($init_type, $init_ctrl_cnt, $module_id, $app_setting){
 
     if $app_setting.optimization == SETTING_OTMZ_AGGRESSIVE {
@@ -237,6 +261,16 @@ fn /*int bool*/ is_valid_module_for_conversion ($init_type, $init_ctrl_cnt, $mod
     }
 }
 
+/*********************************************************************************************
+ * Extract module control data from a module.
+ * 
+ * Input: 
+ *   - $init_type       : the type of the first module
+ *   - $module_id       : the current module id in the SunVox project
+ * Output: 
+ *   - vec<ctrl_val>    : vector of module controls 
+ * 
+ *********************************************************************************************/ 
 fn /*vec<ctrl_val>*/ extr_module_ctrl_group ($init_type, $module_id){
 
     $ctrl_group_vec = vec_new(INT32)
@@ -274,6 +308,17 @@ fn /*vec<ctrl_val>*/ extr_module_ctrl_group ($init_type, $module_id){
     ret($ctrl_group_vec)
 }
 
+/*********************************************************************************************
+ * Extract module control name from a module.
+ * Dropdown option is not supported currently due to the limitation of SunVox Lib
+ * 
+ * Input: 
+ *   - $init_type           : the type of the first module
+ *   - $init_ctrl_cnt       : the number of control expected in a module
+ * Output: 
+ *   - vec<ctrl_val>        : vector of module controls name
+ * 
+ *********************************************************************************************/ 
 fn /*vec<ctrl_desc>*/ extr_module_ctrl_name ($init_type, $init_ctrl_cnt){
 
     $ctrl_desc_vec = vec_new(INT32)
@@ -307,6 +352,17 @@ fn /*vec<ctrl_desc>*/ extr_module_ctrl_name ($init_type, $init_ctrl_cnt){
     ret($ctrl_desc_vec)
 }
 
+/*********************************************************************************************
+ * Extract module control data from a module.
+ * Dropdown option is not supported currently due to the limitation of SunVox Lib
+ * 
+ * Input: 
+ *   - $init_type       : the type of the first module
+ *   - $module_id       : the current module id in the SunVox project
+ * Output: 
+ *   - vec<ctrl_val>    : vector of module controls data
+ * 
+ *********************************************************************************************/ 
 fn /*vec<ctrl_ID>*/ extr_module_ctrl_id ($init_type, $init_ctrl_cnt){
 
     $ctrl_id_vec = vec_new(INT32)

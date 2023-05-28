@@ -21,7 +21,7 @@ fn /*string*/ clear_sunvox_for_patch_cards (){
     ret ($patch_bank_surface_logic_location)
 }
 
-/*
+/**********************************************************************************************
  * This is the only function that should be called externally.
  * Generate patch cards for each modules
  *
@@ -30,7 +30,8 @@ fn /*string*/ clear_sunvox_for_patch_cards (){
  *   - $module_vec      : Vector of module
  * Output:
  *   - Result: Err if the template is missing; else Ok
- */
+ *
+ **********************************************************************************************/
 
 /*pub*/ fn /*result<Ok, Err>*/ generate_patch_cards($app_setting, $module_vec){
 
@@ -62,7 +63,7 @@ fn /*string*/ clear_sunvox_for_patch_cards (){
     ret(Ok(new()))
 }
 
-/*
+/**********************************************************************************************
  * convert each module controls into patch card controls
  *
  * Control Flow:
@@ -79,7 +80,8 @@ fn /*string*/ clear_sunvox_for_patch_cards (){
  *   - $cur_module_name             : String
  * Output:
  *   - void
- */
+ *
+ **********************************************************************************************/
 
 fn /*void*/ convert_individual_modules($patch_card_template_location, $idx, $cur_module, $cur_module_name, $cur_module_type){
     

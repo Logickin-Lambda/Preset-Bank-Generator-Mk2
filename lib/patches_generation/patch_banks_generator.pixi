@@ -30,7 +30,7 @@ fn /*string*/ clear_sunvox_for_patch_banks (){
     ret ($patch_bank_surface_logic_location)
 }
 
-/*
+/**********************************************************************************************
  * This is the only function that should be called externally.
  * Generate patch banks for each modules
  *
@@ -39,7 +39,8 @@ fn /*string*/ clear_sunvox_for_patch_banks (){
  *   - $module_vec      : Vector of module
  * Output:
  *   - Result: Err if the template is missing; else Ok
- */
+ *
+ **********************************************************************************************/
 
 /*pub*/ fn /*retuslt<Ok, Err>*/ generate_patch_banks ($app_setting, $module_vec){
 
@@ -76,7 +77,7 @@ fn /*string*/ clear_sunvox_for_patch_banks (){
     ret(Ok(new()))
 }
 
-/*
+/**********************************************************************************************
  * Finding the optimal size for each bank, to prevent highly unbalanced preset count in multiple banks:
  *   e.g: to prevent a situation when one bank has 120 presets, 
  *        but another one only has 1 if the total preset count is 121
@@ -94,7 +95,8 @@ fn /*string*/ clear_sunvox_for_patch_banks (){
  *                 - bank_cnt    : number of preset banks required 
  *                 - bank_margin : minimal size bank size that is 6 or x * 12
  *                 - patch_cnt   : the number of patches for each bank
- */
+ *
+ **********************************************************************************************/
 fn /*$bank_size*/ cal_module_cnt_for_bank ($module_vec){
 
     $total_module_cnt = $module_vec.size
@@ -128,14 +130,15 @@ fn /*$bank_size*/ cal_module_cnt_for_bank ($module_vec){
     ret ($bank_size)
 }
 
-/*
+/**********************************************************************************************
  * generate common structures used for the patch bank, based on the number of presents in a single bank
  *
  * Input:
  *   - $bank_size  : objects of three integer counters: bank_cnt, bank_margin, patch_cnt
  *   - $bank_idx   : if it ended up splitting multiple banks, each bank has a unique index for fetching content from the module vector
  *   - $module_vec : The controllers data extracted from the sunsynths in module_extractor.pixi
- */
+ *
+ **********************************************************************************************/
 fn /*void*/ build_core_storage_template($bank_size, $module_vec) {
     // build a common core storage structure template for the preset bank
     generate_empty_patterns_for_core_storage($bank_size, $module_vec)
@@ -149,7 +152,7 @@ fn /*void*/ build_core_storage_template($bank_size, $module_vec) {
     sv_save( sv_mod_bank_core, $patch_bank_temp_name );
 }
 
-/*
+/**********************************************************************************************
  * generate blend patterns for the patch bank.
  * Based on the number of controllers, it generate 4 pattern at most.
  * The first 1 - 3 patterns are for data storage, up to 96 tracks;
@@ -159,7 +162,8 @@ fn /*void*/ build_core_storage_template($bank_size, $module_vec) {
  *   - $bank_size  : objects of three integer counters: bank_cnt, bank_margin, patch_cnt
  *   - $bank_idx   : if it ended up splitting multiple banks, each bank has a unique index for fetching content from the module vector
  *   - $module_vec : The controllers data extracted from the sunsynths in module_extractor.pixi
- */
+ *
+ **********************************************************************************************/
 fn /*void*/ generate_empty_patterns_for_core_storage($bank_size, $module_vec) {
     sv_lock( sv_mod_bank_core )
     
@@ -188,7 +192,7 @@ fn /*void*/ generate_empty_patterns_for_core_storage($bank_size, $module_vec) {
     sv_unlock( sv_mod_bank_core )
 }
 
-/*
+/**********************************************************************************************
  * Genreate all the required modules in the core logic of a patch card, with all the required setting;
  * module 1 - n are the vel2ctl that used for sending control signal to the target module,
  * while module n + 1 is a multisynth for sending a signal for all vel2ctls
@@ -197,7 +201,8 @@ fn /*void*/ generate_empty_patterns_for_core_storage($bank_size, $module_vec) {
  *   - $bank_size  : objects of three integer counters: bank_cnt, bank_margin, patch_cnt
  *   - $bank_idx   : if it ended up splitting multiple banks, each bank has a unique index for fetching content from the module vector
  *   - $module_vec : The controllers data extracted from the sunsynths in module_extractor.pixi
- */
+ *
+ **********************************************************************************************/
 fn generate_modules_for_core_logic($bank_size, $module_vec){
 
     // get the location of the output module
@@ -270,7 +275,7 @@ fn generate_modules_for_core_logic($bank_size, $module_vec){
     sv_unlock( sv_mod_bank_core )
 }
 
-/*
+/**********************************************************************************************
  * write all the patch data into the patch storage patterns, and write the play module and stop command into the stopper command.
  * The number of patch written is based on the patch_cnt in the $bank_size object
  * Since the core logic has completed after called this function, the function also saves the core logic as a new project
@@ -279,7 +284,8 @@ fn generate_modules_for_core_logic($bank_size, $module_vec){
  *   - $bank_size  : objects of three integer counters: bank_cnt, bank_margin, patch_cnt
  *   - $bank_idx   : if it ended up splitting multiple banks, each bank has a unique index for fetching content from the module vector
  *   - $module_vec : The controllers data extracted from the sunsynths in module_extractor.pixi
- */
+ *
+ **********************************************************************************************/
 fn save_command_into_core_logic_as_temp($bank_size, $bank_idx, $module_vec){
 
     // logf("$bank_margin: %d \n", $bank_size.bank_margin)
@@ -312,13 +318,14 @@ fn save_command_into_core_logic_as_temp($bank_size, $bank_idx, $module_vec){
     sv_save( sv_mod_bank_core, $patch_bank_temp_name );
 }
 
-/*
+/**********************************************************************************************
  * write one of the preset configuration into one of the line of a pattern
  *
  * Input:
  *   - $module      : Controller data of one of the module from module_vec
  *   - $current_line: the current index of the selected module
- */
+ *
+ **********************************************************************************************/
 fn write_patch_data_for_single_preset($module, $current_line){
 
     // Write all the patch data into patterns 
@@ -333,7 +340,7 @@ fn write_patch_data_for_single_preset($module, $current_line){
     }
 }
 
-/*
+/**********************************************************************************************
  * generete surface control logic for selecting the playhead of the core logic pattern,
  * so that the presets can be switched in real time.
  *
@@ -343,7 +350,8 @@ fn write_patch_data_for_single_preset($module, $current_line){
  *   - $bank_size  : objects of three integer counters: bank_cnt, bank_margin, patch_cnt
  *   - $bank_idx   : if it ended up splitting multiple banks, each bank has a unique index for fetching content from the module vector
  *   - $module_vec : The controllers data extracted from the sunsynths in module_extractor.pixi
- */
+ *
+ **********************************************************************************************/
 fn generate_surface_logic_for_individual_banks($app_setting, $bank_size, $bank_idx, $module_vec){
 
     sv_load( sv_mod_bank_surf, clear_sunvox_for_patch_banks ())
@@ -364,14 +372,15 @@ fn generate_surface_logic_for_individual_banks($app_setting, $bank_size, $bank_i
     sv_save( sv_mod_bank_surf, $patch_bank_temp_name );
 }
 
-/*
+/**********************************************************************************************
  * Create a bunch of multisynth with different phase offset for select the preset
  *
  * Input:
  *   - $bank_size  : objects of three integer counters: bank_cnt, bank_margin, patch_cnt
  *   - $bank_idx   : if it ended up splitting multiple banks, each bank has a unique index for fetching content from the module vector
  *   - $module_vec : The controllers data extracted from the sunsynths in module_extractor.pixi
- */
+ *
+ **********************************************************************************************/
 fn /*void*/ create_multisynth_for_preset_selection($bank_size, $bank_idx, $module_vec){
     // get the location of the input multisynth module, which is 1 in the surface logic template
     $module_id_vec = vec_new(INT32)
@@ -429,14 +438,15 @@ fn /*void*/ create_multisynth_for_preset_selection($bank_size, $bank_idx, $modul
     }
 }
 
-/*
+/**********************************************************************************************
  * Load the core storage into the core logic metamodule inside the surface logic,
  * and set the playback properties of the core sotrage.
  * 
  * Input:
  *   - $bank_idx   : if it ended up splitting multiple banks, each bank has a unique index for fetching content from the module vector
  *   - $module_vec : The controllers data extracted from the sunsynths in module_extractor.pixi
- */
+ *
+ **********************************************************************************************/
 fn /*void*/ load_core_logic_into_surface_logic($bank_idx, $module_vec){
 
     // fetch the correct core logic temp into surface logic
@@ -487,7 +497,7 @@ fn /*void*/ load_core_logic_into_surface_logic($bank_idx, $module_vec){
     }
 }
 
-/*
+/**********************************************************************************************
  * load the surface logic into the preset bank module
  *
  * The surface logic temp will be saved as another temp project for the final export 
@@ -496,7 +506,8 @@ fn /*void*/ load_core_logic_into_surface_logic($bank_idx, $module_vec){
  *   - $app_setting     : Application setting container
  *   - $bank_idx   : if it ended up splitting multiple banks, each bank has a unique index for fetching content from the module vector
  *   - $module_vec : The controllers data extracted from the sunsynths in module_extractor.pixi
- */
+ *
+ **********************************************************************************************/
 fn /*void*/ export_bank( $app_setting, $bank_idx, $module_vec){
 
     // construct preset bank module

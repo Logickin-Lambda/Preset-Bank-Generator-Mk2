@@ -1,3 +1,15 @@
+/**********************************************************************************************
+ * public function for other pixi files for creating the required directories for the conversion
+ * 
+ * Input: 
+ *   - $app_setting: the setting users created from the GUI
+ *
+ * Behaviour:
+ *   - Creates process temp directory
+ *   - Appends backup timestamp for the older directories with the same name
+ *   - Creates a directory based on the user given name in export directory
+ * 
+ **********************************************************************************************/
 fn /*void*/ create_directories_by_setting($app_setting){
 
     // Construct all related directories
@@ -5,6 +17,14 @@ fn /*void*/ create_directories_by_setting($app_setting){
     create_directories_group($app_setting, $app_setting.output_path)
 }
 
+/**********************************************************************************************
+ * Appends backup timestamp for the older directories with the same name 
+ * 
+ * Input: 
+ *   - $app_setting: the setting users created from the GUI
+ *   - $path       : the path where the preset banks are exported
+ * 
+ **********************************************************************************************/
 fn /*void*/ rename_previously_export_as_backup($app_setting, $path) {
 
     // Build timestamp for folder backup
@@ -26,14 +46,14 @@ fn /*void*/ rename_previously_export_as_backup($app_setting, $path) {
     logf("rename old directory %d\n", $result)
 }
 
-/*
- * Create all the reqired folders for the preset conversion
+/**********************************************************************************************
+ * Create all the reqired directories for the preset conversion
  * 
  * Input: 
  *   - $app_setting: the setting users created from the GUI
  *   - $path       : the path where the preset banks are exported
  * 
- */
+ **********************************************************************************************/
 fn /*void*/ create_directories_group($app_setting, $path){
 
     // create process temp folder if there isn't any

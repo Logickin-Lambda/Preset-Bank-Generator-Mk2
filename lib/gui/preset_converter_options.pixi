@@ -9,7 +9,7 @@
  * 	   - additional controller state for customized behaviors 
  *
  ********************************************************************************************/
-fn construct_preset_converter_options_gui () {
+fn /*options_gui object*/ construct_preset_converter_options_gui () {
 
     $options_gui = GUI_new( -1, //parent
                     -0, -0, //x, y position
@@ -47,7 +47,7 @@ fn construct_preset_converter_options_gui () {
     ret($options_gui)
 }
 
-fn build_input_path_input($options_gui){
+fn /*button_object*/ build_input_path_input($options_gui){
 
     // Input Path:
 	$y_offset = 50 
@@ -69,7 +69,7 @@ fn build_input_path_input($options_gui){
 	$options_gui.gui_ptr + 1
 }
 
-fn build_output_folder_name($options_gui){
+fn /*button_object*/ build_output_folder_name($options_gui){
     // File Name:
 	$y_offset = 50
 
@@ -87,7 +87,7 @@ fn build_output_folder_name($options_gui){
 	$options_gui.gui_ptr + 1
 }
 
-fn build_output_path_input($options_gui){
+fn /*button_object*/ build_output_path_input($options_gui){
 	// Output Path:
     $options_gui.children[$options_gui.gui_ptr] = text_message_new($options_gui, -290, -130, "Output Path:", COLOR_DEFAULT)
 	$options_gui.gui_comp_lkup.output_path_label = $options_gui.children[$options_gui.gui_ptr].str[0].text
@@ -110,7 +110,7 @@ fn build_output_path_input($options_gui){
 	$options_gui.gui_ptr + 1
 }
 
-fn build_export_as_check_box($options_gui){
+fn /*check_box group*/ build_export_as_check_box($options_gui){
     // Export Options:
 	$y_offset =  0 //-50	
 
@@ -127,7 +127,7 @@ fn build_export_as_check_box($options_gui){
 	$options_gui.gui_ptr + 1
 }
 
-fn build_optimization_radio_button($options_gui){
+fn /*radio button group*/ build_optimization_radio_button($options_gui){
     // Storage Optimization
     $options_gui.children[$options_gui.gui_ptr] = text_message_new($options_gui, -290, -30, "Optimization:", COLOR_DEFAULT)
 	$options_gui.gui_comp_lkup.otmz_label = $options_gui.children[$options_gui.gui_ptr].str[0].text
@@ -148,7 +148,7 @@ fn build_optimization_radio_button($options_gui){
 	$options_gui.gui_comp_lkup.otmz_aggressive_cb.str[0].color = COLOR_DANGER
 }
 
-fn build_message_box($options_gui){
+fn /*message box object*/ build_message_box($options_gui){
     // Message Box, window frame with 
 	$y_offset = -50
 
@@ -178,7 +178,7 @@ fn build_message_box($options_gui){
  * 	 - calling native text editor and file dialogs
  *
  *********************************************************************************************/
-fn handle_options_events($options_gui){
+fn /*void*/ handle_options_events($options_gui){
 
 	$gui_comp = $options_gui.gui_comp_lkup
 
@@ -256,7 +256,7 @@ fn handle_options_events($options_gui){
  *   - store the actual data in str_full instead of str, at the same child level 
  *
  *********************************************************************************************/
-fn generate_message_guide($options_gui){
+fn /*void*/ generate_message_guide($options_gui){
 
 	$gui_comp = $options_gui.gui_comp_lkup
 	$current_x = EVT[ EVT_X ]
@@ -331,7 +331,7 @@ fn generate_message_guide($options_gui){
  *	 - Return 0 if the mouse cursor outside the specified component
  *
  *********************************************************************************************/
-fn effective_component_region_check ($current_x, $current_y, $components){
+fn /*int bool*/ effective_component_region_check ($current_x, $current_y, $components){
 	
 	$x_start = $components.x
 	$x_end   = $x_start + $components.w
@@ -357,7 +357,7 @@ fn effective_component_region_check ($current_x, $current_y, $components){
  *	 - Return 0 if the mouse cursor outside the specified component
  *
  *********************************************************************************************/
-fn effective_direct_region_check ($current_x, $current_y, $x_start, $x_end, $y_start, $y_end){
+fn /*int bool*/ effective_direct_region_check ($current_x, $current_y, $x_start, $x_end, $y_start, $y_end){
 	if $current_x >= $x_start && $current_x <= $x_end 
 	  && $current_y >= $y_start && $current_y <= $y_end {
 		ret (1)
@@ -381,7 +381,7 @@ fn effective_direct_region_check ($current_x, $current_y, $x_start, $x_end, $y_s
  *   - store the actual data in str_full instead of str, at the same child level 
  *
  *********************************************************************************************/ 
-fn click_and_edit_text ($text_box_button, $label, $unique_empty_string){
+fn /*void*/ click_and_edit_text ($text_box_button, $label, $unique_empty_string){
 
     $modified_text = textinput_dialog ($text_box_button.children[0].str_full, $label)
 	$text_box_button.children[0].str[0].text = trim_long_string ($modified_text, $unique_empty_string)
@@ -406,7 +406,7 @@ fn click_and_edit_text ($text_box_button, $label, $unique_empty_string){
  *   - store the actual data in str_full instead of str, at the same child level 
  *
  *********************************************************************************************/
-fn click_and_pick_file ($load_button, $text_box_button, $label, $unique_empty_string) {
+fn /*void*/ click_and_pick_file ($load_button, $text_box_button, $label, $unique_empty_string) {
 
 	$file_path = file_dialog($label, "sunvox", $label, "")
 	$text_box_button.children[0].str[0].text = trim_long_string ($file_path, $unique_empty_string)
@@ -427,7 +427,7 @@ fn click_and_pick_file ($load_button, $text_box_button, $label, $unique_empty_st
  *   - if the string contains more than 60 characters, only the last 60 characters will be kept,
  *     and the head of string will be replaced by "..."
  *********************************************************************************************/
-fn trim_long_string ($modified_text, $unique_empty_string){
+fn /*void*/ trim_long_string ($modified_text, $unique_empty_string){
 
 	if strlen($modified_text) >= 60 {
 		strcat($unique_empty_string, "...")

@@ -3,7 +3,18 @@ EXTR_TYPE_SUNVOX    = 0
 EXTR_TYPE_ZIP       = 1
 EXTR_TYPE_FOLDER    = 2
 
-fn /*vec<Container> OR vec<Err>*/ extract_modules_into_sunvox ($app_setting) {
+
+/*********************************************************************************************
+ * Public function for extracting modules into a vector for generating banks, 
+ * based on the user setting
+ * 
+ * Input: 
+ *   - $app_setting
+ * Output: 
+ *   - Result object which contains the vector of imported module, and the error message
+ * 
+ *********************************************************************************************/ 
+/*pub*/ fn /*vec<Container> OR vec<Err>*/ extract_modules_into_sunvox ($app_setting) {
 
     $error_vec = vec_new(INT32);
 
@@ -43,6 +54,15 @@ fn /*vec<Container> OR vec<Err>*/ extract_modules_into_sunvox ($app_setting) {
     }
 }
 
+/*********************************************************************************************
+ * Get the file name given from the import path
+ * 
+ * Input: 
+ *   - $input_path from the app_setting
+ * Output: 
+ *   - file name in string
+ * 
+ *********************************************************************************************/ 
 fn /*String*/ get_file_name_from_input_path($input_path){
     $file_name = ""
     $file_name[0] = 0
@@ -57,6 +77,15 @@ fn /*String*/ get_file_name_from_input_path($input_path){
     }
 }
 
+/*********************************************************************************************
+ * Get the file type given from the import path
+ * 
+ * Input: 
+ *   - $input_path from the app_setting
+ * Output: 
+ *   - file type in string
+ * 
+ *********************************************************************************************/ 
 fn /*String*/ get_file_type_from_input_path($input_path){
     $file_type = ""
     $file_type[0] = 0
@@ -71,6 +100,20 @@ fn /*String*/ get_file_type_from_input_path($input_path){
     }
 }
 
+/*********************************************************************************************
+ * Choose the import algorithm based on the file type, 
+ * some of the types are reserved for future update
+ * 
+ * Input: 
+ *   - $input_path from the app_setting
+ * Output: 
+ *   - int code:
+ *      -  0: .sunvox
+ *      -  1: .zip
+ *      -  2: folder
+ *      - -1: invalid type
+ * 
+ *********************************************************************************************/ 
 fn /*int*/ determine_extraction_type ($input_path){
     $file_name = get_file_name_from_input_path($input_path) 
     //logf("file name: %s\n", $file_name)

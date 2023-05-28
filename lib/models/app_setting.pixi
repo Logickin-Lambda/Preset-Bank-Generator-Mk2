@@ -6,7 +6,16 @@ SETTING_OTMZ_NONE       = 1
 SETTING_OTMZ_NORMAL     = 2
 SETTING_OTMZ_AGGRESSIVE = 4
 
-fn app_setting_new($options_gui){
+/*********************************************************************************************
+ * Save user setting into a dto object called app_setting
+ * 
+ * Input: 
+ *   - $Option GUI object
+ * Output: 
+ *   - app_setting object with user settings
+ * 
+ *********************************************************************************************/ 
+fn /*app_setting object*/ app_setting_new($options_gui){
     $app_setting = new()
     clean($app_setting)
 

@@ -1,9 +1,19 @@
-fn display_settings_and_validation($options_gui){
+/*********************************************************************************************
+ * This function is used for control the paging flow,
+ * once the export button has been clicked, user settings will be stored in app_setting object
+ * 
+ * Input: 
+ *   - $options_gui		: The GUI object of the option page
+ * Behavior: 
+ *   - $app_setting     : Object for storing user setting before export cards and banks
+ *
+ *********************************************************************************************/
+fn /*app_setting*/ display_settings_and_validation($options_gui){
 
     $has_validated = 0              // 0 = not yet validated; 1 = has been validated
     $error_vec     = vec_new(INT32)
 
-    $popup   = new()
+    $popup         = new()
 
     while 1 {
         clear()
@@ -46,7 +56,14 @@ fn display_settings_and_validation($options_gui){
     ret(app_setting_new($options_gui))
 }
 
-fn create_popup_based_on_error($error_vec){
+/*********************************************************************************************
+ * Generate a popup after user clicks the export button
+ * 
+ * Input: 
+ *   - $error_vec		: The GUI object of the option page
+ *
+ *********************************************************************************************/
+fn /*void*/ create_popup_based_on_error($error_vec){
     if $error_vec.size > 0 {
         $error_popup = construct_preset_popup($error_vec, POPUP_ERROR)
         ret($error_popup)
@@ -59,7 +76,11 @@ fn create_popup_based_on_error($error_vec){
     }   
 }
 
-fn render_processing_message(){
+/*********************************************************************************************
+ * Generate a popup with processing message
+ *
+ *********************************************************************************************/
+fn /*void*/ render_processing_message(){
     clear()
     $popup_msg = vec_new(INT32)
     $popup_msg.push($popup_msg, "Preset Conversion in progress, please wait...")
@@ -71,7 +92,14 @@ fn render_processing_message(){
     frame()
 }
 
-fn render_complete_message($msg_vec){
+/*********************************************************************************************
+ * Generate a popup to summerize the export result
+ * 
+ * Input: 
+ *   - $msg_vec		: The GUI object of the option page
+ *
+ *********************************************************************************************/
+fn /*void*/ render_complete_message($msg_vec){
 
     $result_popup = new(INT32)
 
@@ -101,7 +129,14 @@ fn render_complete_message($msg_vec){
 
 }
 
-fn render_error_message($msg_vec){
+/*********************************************************************************************
+ * Generate an error popup if there is an error at the exportation run time
+ * 
+ * Input: 
+ *   - $msg_vec		: The GUI object of the option page
+ *
+ *********************************************************************************************/
+fn /*void*/ render_error_message($msg_vec){
 
     $processing_popup = construct_preset_popup($msg_vec, POPUP_ERROR)
 
